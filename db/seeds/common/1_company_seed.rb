@@ -1,6 +1,6 @@
-list_comapny = []
+list_company = []
 10.times do
-  list_comapny.push(
+  list_company.push(
     {
       name: Faker::Company.name,
       owner: Faker::Name.name,
@@ -15,7 +15,7 @@ list_comapny = []
 end
 Area.where(status: :active).each do |tenant|
   tenant.change_tenant do
-    list_comapny.each do |com|
+    list_company.each do |com|
       unless Company.exists?(name: com[:name], company_type: com[:company_type])
         Company.create(com)
         puts "config: #{com[:name]} created"

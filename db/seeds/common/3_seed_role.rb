@@ -24,7 +24,7 @@
     status: 1
   },
   {
-    role: "anomymous",
+    role: "anonymous",
     allow_all_action: false,
     allow_create: false,
     allow_update: false,

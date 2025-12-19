@@ -3,12 +3,12 @@ class Role < ApplicationRecord
     user: 1,
     admin: 2,
     owner: 3,
-    anomymous: 4,
+    anonymous: 4,
   }
 
   enum status: {
     active: 1,
-    inacive: 2,
+    inactive: 2,
     deleted: 3,
   }
 

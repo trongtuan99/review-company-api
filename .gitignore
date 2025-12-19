@@ -32,5 +32,8 @@
 .generators
 
 coverage
-
+.claude
+plans
+docs
+/CLAUDE.md
 /vendor/

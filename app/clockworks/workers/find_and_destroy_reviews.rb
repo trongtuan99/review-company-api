@@ -1,14 +1,14 @@
 class Workers::FindAndDestroyReviews
   include Sidekiq::Worker
-  sidekiq_options queue: SidekiqQueue::FIND_AND_DESTROY_REIVEWS, retry: false
+  sidekiq_options queue: SidekiqQueue::FIND_AND_DESTROY_REVIEWS, retry: false
 
   def perform review_id
-    review = Company.find_by(id: review_id)
+    review = Review.find_by(id: review_id)
     return unless review
     Review.transaction do
       review.destroy!
     end
-    puts "deleted company #{review_id}"
+    puts "deleted review #{review_id}"
   end
 
   def execute

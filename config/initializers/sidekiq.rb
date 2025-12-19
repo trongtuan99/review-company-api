@@ -10,4 +10,6 @@ Sidekiq.configure_client do |config|
   config.redis = sidekiq_config
 end
 
-Sidekiq::Extensions.enable_delay!
+# Sidekiq::Extensions.enable_delay! is deprecated and will be removed in Sidekiq 7.0
+# Use Sidekiq::Worker.perform_async instead of .delay methods
+# Sidekiq::Extensions.enable_delay!

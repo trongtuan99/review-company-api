@@ -1,6 +1,6 @@
 class Workers::FindAndDestroyCompany
   include Sidekiq::Worker
-  sidekiq_options queue: SidekiqQueue::FIND_AND_DESTROY_COMAPNY, retry: false
+  sidekiq_options queue: SidekiqQueue::FIND_AND_DESTROY_COMPANY, retry: false
 
   def perform company_id
     company = Company.find_by(id: company_id)
