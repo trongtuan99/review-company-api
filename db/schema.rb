@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_12_19_170216) do
+ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -40,6 +40,10 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_19_170216) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_deleted", default: false
+    t.string "industry"
+    t.integer "employee_count_min", default: 0
+    t.integer "employee_count_max", default: 0
+    t.boolean "is_hiring", default: false
   end
 
   create_table "favorites", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -89,6 +93,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_19_170216) do
     t.integer "total_like", default: 0
     t.integer "total_dislike", default: 0
     t.integer "total_reply", default: 0
+    t.string "job_title"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

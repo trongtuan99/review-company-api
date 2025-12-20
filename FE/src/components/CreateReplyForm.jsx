@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { replyService } from '../services/replyService';
+import { useReplyMutations } from '../hooks/useReplyMutations';
 import './CreateReplyForm.css';
 
 const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
   const [content, setContent] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { createReply, isCreating } = useReplyMutations(reviewId);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,19 +17,11 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
     }
 
     try {
-      setLoading(true);
-      const response = await replyService.createReply(reviewId, content);
-      
-      if (response.status === 'ok' || response.status === 'success') {
-        onSuccess?.();
-        setContent('');
-      } else {
-        setError(response.message || 'Không thể tạo trả lời');
-      }
+      await createReply(content);
+      onSuccess?.();
+      setContent('');
     } catch (err) {
       setError(err.message || err.error || 'Không thể tạo trả lời');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -50,8 +42,8 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
               Hủy
             </button>
           )}
-          <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Đang gửi...' : 'Gửi trả lời'}
+          <button type="submit" disabled={isCreating} className="btn-primary">
+            {isCreating ? 'Đang gửi...' : 'Gửi trả lời'}
           </button>
         </div>
       </form>

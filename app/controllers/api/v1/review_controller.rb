@@ -1,18 +1,42 @@
 class Api::V1::ReviewController < ApplicationController
-  around_action :with_transaction, except: %i[index]
-  before_action :authenticate_user!, except: %i[index]
+  around_action :with_transaction, except: %i[index recent]
+  before_action :authenticate_user!, except: %i[index recent]
   before_action :get_company, only: [:create, :index]
   before_action :get_review, only: [:update, :delete_review, :like, :dislike]
   before_action :validate_update, only: :update
   before_action :get_like_record, only: [:like, :dislike]
 
   def index
-    data = @company.reviews.all
-    render json: json_with_success(
+    page = params[:page]&.to_i || 1
+    per_page = params[:per_page]&.to_i || 10
+    
+    reviews_query = @company.reviews.where(is_deleted: false)
+    total_count = reviews_query.count
+    
+    if page == 1
+      top_reviews = reviews_query.order(total_like: :desc, created_at: :desc).limit(10).to_a
+      recent_reviews = reviews_query.order(created_at: :desc).limit(10).to_a
+      combined = (top_reviews + recent_reviews).uniq
+      data = combined.sort_by { |r| -r.created_at.to_i }.first(10)
+    else
+      offset = (page - 1) * per_page
+      data = reviews_query.order(created_at: :desc).offset(offset).limit(per_page)
+    end
+    
+    response_data = json_with_success(
       data: data, 
       default_serializer: ReviewSerializer,
       options: { scope: current_user }
     )
+    
+    response_data[:pagination] = {
+      page: page,
+      per_page: per_page,
+      total: total_count,
+      total_pages: (total_count.to_f / per_page).ceil
+    }
+    
+    render json: response_data
   end
 
   def create
@@ -38,6 +62,20 @@ class Api::V1::ReviewController < ApplicationController
 
   def dislike
     handle_like_dislike(:dislike)
+  end
+
+  def recent
+    limit = params[:limit]&.to_i || 10
+    reviews = Review.where(is_deleted: false)
+                    .order(created_at: :desc)
+                    .limit(limit)
+                    .includes(:company)
+    
+    render json: json_with_success(
+      data: reviews, 
+      default_serializer: ReviewSerializer,
+      options: { scope: current_user }
+    )
   end
 
   private
@@ -98,7 +136,7 @@ class Api::V1::ReviewController < ApplicationController
   end
 
   def create_update_params
-    params.require(:review).permit(:title, :reviews_content, :score)
+    params.require(:review).permit(:title, :reviews_content, :score, :job_title, :is_anonymous)
   end
 
   def get_like_record

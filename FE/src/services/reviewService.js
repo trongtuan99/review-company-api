@@ -2,9 +2,9 @@ import apiClient from './api';
 
 // Review Services
 export const reviewService = {
-  // Get reviews for a company
-  getReviews: async (companyId) => {
-    return await apiClient.get(`/review?company_id=${companyId}`);
+  // Get reviews for a company with pagination
+  getReviews: async (companyId, page = 1, perPage = 10) => {
+    return await apiClient.get(`/review?company_id=${companyId}&page=${page}&per_page=${perPage}`);
   },
 
   // Create review
@@ -34,6 +34,11 @@ export const reviewService = {
   // Dislike review
   dislikeReview: async (reviewId) => {
     return await apiClient.put(`/review/${reviewId}/dislike`);
+  },
+
+  // Get recent reviews (all companies)
+  getRecentReviews: async (limit = 10) => {
+    return await apiClient.get(`/review/recent?limit=${limit}`);
   },
 };
 

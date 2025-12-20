@@ -24,6 +24,9 @@ module ApiRoutes
               put :like
               put :dislike
             end
+            collection do
+              get :recent
+            end
           end
 
           resources :reply, only: %i[index create update destroy] do
@@ -33,6 +36,10 @@ module ApiRoutes
             member do
               put :delete_user
               put :update_profile
+            end
+            collection do
+              get :activity_stats
+              get :recent_comments
             end
           end
 

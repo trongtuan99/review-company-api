@@ -22,7 +22,7 @@ const CompanyDetail = () => {
     data: reviewsResponse, 
     isLoading: reviewsLoading,
     refetch: refetchReviews 
-  } = useReviews(id);
+  } = useReviews(id, 1);
 
   const { 
     data: favoriteStatusResponse,
@@ -41,11 +41,15 @@ const CompanyDetail = () => {
   }
   
   let reviews = [];
+  let reviewsPagination = null;
   if (reviewsResponse) {
     if (Array.isArray(reviewsResponse.data)) {
       reviews = reviewsResponse.data;
     } else if (Array.isArray(reviewsResponse)) {
       reviews = reviewsResponse;
+    }
+    if (reviewsResponse.pagination) {
+      reviewsPagination = reviewsResponse.pagination;
     }
   }
   
@@ -131,33 +135,68 @@ const CompanyDetail = () => {
         </div>
       </div>
 
-      <div className="company-info">
-        <div className="info-item">
-          <strong>Chủ sở hữu:</strong> {company.owner}
+      <div className="company-stats">
+        <div className="stat-card">
+          <div className="stat-icon">⭐</div>
+          <div className="stat-content">
+            <div className="stat-value">{company.avg_score?.toFixed(1) || '0.0'}</div>
+            <div className="stat-label">Điểm đánh giá</div>
+          </div>
         </div>
-        {company.main_office && (
-          <div className="info-item">
-            <strong>Văn phòng:</strong> {company.main_office}
+        <div className="stat-card">
+          <div className="stat-icon">📝</div>
+          <div className="stat-content">
+            <div className="stat-value">{company.total_reviews || 0}</div>
+            <div className="stat-label">Tổng đánh giá</div>
           </div>
-        )}
-        {company.phone && (
+        </div>
+      </div>
+
+      <div className="company-info">
+        <h3 className="info-section-title">Thông tin công ty</h3>
+        <div className="info-grid">
           <div className="info-item">
-            <strong>Điện thoại:</strong> {company.phone}
+            <div className="info-icon">👤</div>
+            <div className="info-content">
+              <div className="info-label">Chủ sở hữu</div>
+              <div className="info-value">{company.owner}</div>
+            </div>
           </div>
-        )}
-        {company.website && (
-          <div className="info-item">
-            <strong>Website:</strong>{' '}
-            <a href={company.website} target="_blank" rel="noopener noreferrer">
-              {company.website}
-            </a>
-          </div>
-        )}
+          {company.main_office && (
+            <div className="info-item">
+              <div className="info-icon">📍</div>
+              <div className="info-content">
+                <div className="info-label">Văn phòng</div>
+                <div className="info-value">{company.main_office}</div>
+              </div>
+            </div>
+          )}
+          {company.phone && (
+            <div className="info-item">
+              <div className="info-icon">📞</div>
+              <div className="info-content">
+                <div className="info-label">Điện thoại</div>
+                <div className="info-value">{company.phone}</div>
+              </div>
+            </div>
+          )}
+          {company.website && (
+            <div className="info-item">
+              <div className="info-icon">🌐</div>
+              <div className="info-content">
+                <div className="info-label">Website</div>
+                <a href={company.website} target="_blank" rel="noopener noreferrer" className="info-value link">
+                  {company.website}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="reviews-section">
         <div className="reviews-header">
-          <h2>Đánh giá ({reviews.length})</h2>
+          <h2>Đánh giá</h2>
           {isAuthenticated && (
             <button
               className="btn-primary"
@@ -176,10 +215,15 @@ const CompanyDetail = () => {
           />
         )}
 
-        <ReviewList reviews={reviews} onUpdate={() => {
-          refetchReviews();
-          refetchCompany();
-        }} companyId={id} />
+        <ReviewList 
+          reviews={reviews} 
+          pagination={reviewsPagination}
+          onUpdate={() => {
+            refetchReviews();
+            refetchCompany();
+          }} 
+          companyId={id} 
+        />
       </div>
     </div>
   );

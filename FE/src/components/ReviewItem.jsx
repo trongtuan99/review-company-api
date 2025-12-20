@@ -16,7 +16,16 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
   }, [review]);
 
   const handleMutationSuccess = (reviewId, reviewData) => {
-    setCurrentReview(reviewData);
+    if (reviewData && reviewData.id === reviewId) {
+      // Ensure we have all the necessary fields from server response
+      setCurrentReview(prev => ({
+        ...prev,
+        ...reviewData,
+        total_like: reviewData.total_like ?? prev.total_like,
+        total_dislike: reviewData.total_dislike ?? prev.total_dislike,
+        user_like_status: reviewData.user_like_status ?? prev.user_like_status,
+      }));
+    }
     onUpdate?.();
   };
 
@@ -32,12 +41,86 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
 
   const handleLike = () => {
     if (loading) return;
+    
+    // Optimistic update
+    const previousStatus = currentReview.user_like_status;
+    const previousLike = currentReview.total_like || 0;
+    const previousDislike = currentReview.total_dislike || 0;
+    
+    let newStatus = 'like';
+    let newLike = previousLike;
+    let newDislike = previousDislike;
+    
+    if (previousStatus === 'like') {
+      // Toggle off
+      newStatus = null;
+      newLike = Math.max(0, previousLike - 1);
+    } else {
+      // Toggle on
+      newStatus = 'like';
+      if (previousStatus === 'dislike') {
+        newDislike = Math.max(0, previousDislike - 1);
+        newLike = previousLike + 1;
+      } else {
+        newLike = previousLike + 1;
+      }
+    }
+    
+    setCurrentReview({
+      ...currentReview,
+      user_like_status: newStatus,
+      total_like: newLike,
+      total_dislike: newDislike,
+    });
+    
     likeReview();
   };
 
   const handleDislike = () => {
     if (loading) return;
+    
+    // Optimistic update
+    const previousStatus = currentReview.user_like_status;
+    const previousLike = currentReview.total_like || 0;
+    const previousDislike = currentReview.total_dislike || 0;
+    
+    let newStatus = 'dislike';
+    let newLike = previousLike;
+    let newDislike = previousDislike;
+    
+    if (previousStatus === 'dislike') {
+      // Toggle off
+      newStatus = null;
+      newDislike = Math.max(0, previousDislike - 1);
+    } else {
+      // Toggle on
+      newStatus = 'dislike';
+      if (previousStatus === 'like') {
+        newLike = Math.max(0, previousLike - 1);
+        newDislike = previousDislike + 1;
+      } else {
+        newDislike = previousDislike + 1;
+      }
+    }
+    
+    setCurrentReview({
+      ...currentReview,
+      user_like_status: newStatus,
+      total_like: newLike,
+      total_dislike: newDislike,
+    });
+    
     dislikeReview();
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
   };
 
   return (
@@ -47,15 +130,23 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
           <h4>{currentReview.title}</h4>
           <div className="score-badge">⭐ {currentReview.score}/10</div>
         </div>
-        {currentReview.is_anonymous ? (
-          <span className="anonymous-badge">Ẩn danh</span>
-        ) : (
-          <span className="review-author">Người dùng</span>
-        )}
+        <div className="review-meta">
+          {currentReview.job_title && (
+            <span className="job-title-badge">💼 {currentReview.job_title}</span>
+          )}
+          {currentReview.is_anonymous ? (
+            <span className="anonymous-badge">🔒 Ẩn danh</span>
+          ) : (
+            <span className="review-author">👤 {currentReview.user_name || 'Người dùng'}</span>
+          )}
+          {currentReview.created_at && (
+            <span className="review-date">{formatDate(currentReview.created_at)}</span>
+          )}
+        </div>
       </div>
 
       <div className="review-content">
-        <p>{currentReview.reviews_content}</p>
+        <p>{currentReview.reviews_content || 'Không có nội dung đánh giá.'}</p>
       </div>
 
       <div className="review-actions">

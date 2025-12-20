@@ -43,6 +43,127 @@
   margin: 0;
 }
 
+.filters-section {
+  background: var(--glassdoor-white);
+  padding: 28px 32px;
+  border-bottom: 1px solid var(--glassdoor-border);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.sort-controls .filter-select {
+  flex: 1;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.filter-select {
+  padding: 12px 16px;
+  border: 2px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px;
+  padding-right: 40px;
+}
+
+.filter-select:hover {
+  border-color: var(--glassdoor-green);
+  background-color: var(--glassdoor-gray-bg);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.1);
+}
+
+.filter-input {
+  padding: 12px 16px;
+  border: 2px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  transition: all 0.2s ease;
+}
+
+.filter-input:hover {
+  border-color: var(--glassdoor-green);
+  background-color: var(--glassdoor-gray-bg);
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.1);
+}
+
+.filter-input::placeholder {
+  color: var(--glassdoor-gray-light);
+}
+
+.sort-order-btn {
+  padding: 12px 16px;
+  background: var(--glassdoor-white);
+  border: 2px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+}
+
+.sort-order-btn:hover {
+  background: var(--glassdoor-green);
+  border-color: var(--glassdoor-green);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 168, 107, 0.2);
+}
+
+.sort-order-btn:active {
+  transform: translateY(0);
+}
+
 .companies-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -132,6 +253,30 @@
 
   .page-header h1 {
     font-size: 28px;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px 20px;
+  }
+
+  .filter-group {
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+  }
+
+  .sort-controls {
+    width: 100%;
+  }
+
+  .sort-controls .filter-select {
+    flex: 1;
+  }
+
+  .sort-order-btn {
+    min-width: 50px;
   }
 
   .companies-grid {

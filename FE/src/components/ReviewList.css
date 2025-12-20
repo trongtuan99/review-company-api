@@ -4,6 +4,37 @@
   gap: 0;
 }
 
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+  margin-top: 20px;
+}
+
+.btn-load-more {
+  background: var(--glassdoor-white);
+  border: 2px solid var(--glassdoor-green);
+  color: var(--glassdoor-green);
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-load-more:hover:not(:disabled) {
+  background: var(--glassdoor-green);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 168, 107, 0.3);
+}
+
+.btn-load-more:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .empty-reviews {
   text-align: center;
   padding: 60px 24px;

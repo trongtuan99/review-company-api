@@ -7,4 +7,7 @@ export { useFavoriteMutations } from './useFavoriteMutations';
 export { useCompanyMutations } from './useCompanyMutations';
 export { useReviewMutations } from './useReviewMutations';
 export { useReviewMutationsExtended } from './useReviewMutationsExtended';
+export { useUserActivityStats, useUserRecentComments } from './useUserActivity';
+export { useReplyMutations } from './useReplyMutations';
+export { useRecentReviews } from './useRecentReviews';
 

@@ -12,40 +12,69 @@ class Api::V1::CompanyController < ApplicationController
     page = params[:page]&.to_i || 1
     per_page = params[:per_page]&.to_i || 20
     
-    # Base query: only show non-deleted companies
+    filter_by = params[:filter_by]
+    sort_by = params[:sort_by] || 'created_at'
+    sort_order = params[:sort_order] || 'desc'
+    location = params[:location]
+    
     base_query = Company.where(is_deleted: false)
     
     if query.present?
-      # Search by name
-      data = base_query.where("name ILIKE ?", "%#{query}%").order(created_at: :desc)
-    elsif top_rated
-      # Get top 10 companies by rating (avg_score)
-      # Only include companies with at least 1 review
+      base_query = base_query.where("name ILIKE ?", "%#{query}%")
+    end
+    
+    if location.present?
+      base_query = base_query.where("main_office ILIKE ?", "%#{location}%")
+    end
+    
+    if filter_by.present?
+      case filter_by
+      when 'most_reviews'
+        base_query = base_query.where("total_reviews > 0")
+      when 'highest_rated'
+        base_query = base_query.where.not(avg_score: nil).where("total_reviews > 0")
+      when 'most_liked'
+        base_query = base_query.where("total_reviews > 0")
+      end
+    end
+    
+    if top_rated
       data = base_query
         .where.not(avg_score: nil)
         .where("total_reviews > 0")
         .order(avg_score: :desc, total_reviews: :desc)
         .limit(10)
     elsif exclude_ids.present?
-      # Get companies except the ones in exclude_ids (for bottom section)
-      data = base_query
-        .where.not(id: exclude_ids)
-        .order(created_at: :desc)
-      
-      # Apply limit if provided
+      data = base_query.where.not(id: exclude_ids)
+      case sort_by
+      when 'avg_score'
+        data = data.order(avg_score: sort_order.to_sym, total_reviews: :desc, created_at: :desc)
+      when 'total_reviews'
+        data = data.order(total_reviews: sort_order.to_sym, avg_score: :desc, created_at: :desc)
+      when 'created_at'
+        data = data.order(created_at: sort_order.to_sym)
+      else
+        data = data.order(created_at: :desc)
+      end
       data = data.limit(limit) if limit.present? && limit > 0
     else
-      # Show all companies, ordered by most recent first
-      data = base_query.order(created_at: :desc)
+      case sort_by
+      when 'avg_score'
+        data = base_query.order(avg_score: sort_order.to_sym, total_reviews: :desc, created_at: :desc)
+      when 'total_reviews'
+        data = base_query.order(total_reviews: sort_order.to_sym, avg_score: :desc, created_at: :desc)
+      when 'created_at'
+        data = base_query.order(created_at: sort_order.to_sym)
+      else
+        data = base_query.order(created_at: :desc)
+      end
       
-      # Apply pagination if page/per_page provided
       if page.present? && per_page.present?
         total_count = data.count
         total_pages = (total_count.to_f / per_page).ceil
         offset = (page - 1) * per_page
         data = data.limit(per_page).offset(offset)
         
-        # Return pagination info in response
         return render json: {
           status: 'ok',
           data: data.map { |c| CompanySerializer.new(c).as_json },
@@ -92,11 +121,13 @@ class Api::V1::CompanyController < ApplicationController
   end
 
   def create_params
-    params.require(:company).permit(:name, :owner, :phone, :main_office, :website)
+    params.require(:company).permit(:name, :owner, :phone, :main_office, :website, 
+                                     :industry, :employee_count_min, :employee_count_max, :is_hiring)
   end
 
   def update_params
-    params.require(:company).permit(:owner, :phone, :main_office, :website)
+    params.require(:company).permit(:owner, :phone, :main_office, :website,
+                                     :industry, :employee_count_min, :employee_count_max, :is_hiring)
   end
 
   def check_role_permission

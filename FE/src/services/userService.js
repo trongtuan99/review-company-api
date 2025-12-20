@@ -16,5 +16,15 @@ export const userService = {
   deleteUser: async (userId) => {
     return await apiClient.put(`/user/${userId}/delete_user`);
   },
+
+  // Get user activity stats (current user)
+  getActivityStats: async () => {
+    return await apiClient.get(`/user/activity_stats`);
+  },
+
+  // Get recent comments/replies (current user)
+  getRecentComments: async (limit = 10) => {
+    return await apiClient.get(`/user/recent_comments?limit=${limit}`);
+  },
 };
 

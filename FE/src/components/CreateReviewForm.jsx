@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { reviewService } from '../services/reviewService';
+import { useReviewMutationsExtended } from '../hooks/useReviewMutationsExtended';
+import StarRating from './StarRating';
 import './CreateReviewForm.css';
 
 const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
@@ -7,14 +8,41 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
     title: '',
     reviews_content: '',
     score: 5,
+    job_title: '',
+    custom_job_title: '',
+    is_anonymous: false,
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const { createReview, isCreating } = useReviewMutationsExtended(companyId);
+
+  const commonJobTitles = [
+    'Software Engineer',
+    'Senior Software Engineer',
+    'Frontend Developer',
+    'Backend Developer',
+    'Full Stack Developer',
+    'DevOps Engineer',
+    'QA Engineer',
+    'Product Manager',
+    'Project Manager',
+    'Business Analyst',
+    'Data Analyst',
+    'Data Scientist',
+    'UI/UX Designer',
+    'Marketing Manager',
+    'Sales Manager',
+    'HR Manager',
+    'Accountant',
+    'Customer Support',
+    'Intern',
+    'Other'
+  ];
 
   const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: type === 'checkbox' ? checked : value,
     });
   };
 
@@ -28,19 +56,17 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
     }
 
     try {
-      setLoading(true);
-      const response = await reviewService.createReview(companyId, formData);
+      const submitData = {
+        ...formData,
+        job_title: formData.job_title === 'Other' ? formData.custom_job_title : formData.job_title,
+      };
+      delete submitData.custom_job_title;
       
-      if (response.status === 'ok' || response.status === 'success') {
-        onSuccess?.();
-        setFormData({ title: '', reviews_content: '', score: 5 });
-      } else {
-        setError(response.message || 'Không thể tạo đánh giá');
-      }
+      await createReview({ companyId, reviewData: submitData });
+      onSuccess?.();
+      setFormData({ title: '', reviews_content: '', score: 5, job_title: '', custom_job_title: '', is_anonymous: false });
     } catch (err) {
       setError(err.message || err.error || 'Không thể tạo đánh giá');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -64,15 +90,37 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
         </div>
         <div className="form-group">
           <label>Điểm đánh giá (1-10)</label>
-          <input
-            type="number"
-            name="score"
+          <StarRating
             value={formData.score}
-            onChange={handleChange}
-            min={1}
-            max={10}
-            required
+            onChange={(score) => setFormData({ ...formData, score })}
           />
+        </div>
+        <div className="form-group">
+          <label>Chức danh công việc tại công ty này</label>
+          <select
+            name="job_title"
+            value={formData.job_title}
+            onChange={handleChange}
+            className="form-select"
+          >
+            <option value="">-- Chọn chức danh --</option>
+            {commonJobTitles.map((title) => (
+              <option key={title} value={title}>
+                {title}
+              </option>
+            ))}
+          </select>
+          {formData.job_title === 'Other' && (
+            <input
+              type="text"
+              name="custom_job_title"
+              value={formData.custom_job_title}
+              onChange={handleChange}
+              placeholder="Nhập chức danh của bạn..."
+              className="form-input"
+              style={{ marginTop: '8px' }}
+            />
+          )}
         </div>
         <div className="form-group">
           <label>Nội dung đánh giá</label>
@@ -84,12 +132,24 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
             placeholder="Chia sẻ trải nghiệm của bạn..."
           />
         </div>
+        <div className="form-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="is_anonymous"
+              checked={formData.is_anonymous}
+              onChange={handleChange}
+            />
+            <span>Đánh giá ẩn danh</span>
+          </label>
+          <p className="form-hint">Nếu chọn, tên của bạn sẽ không được hiển thị công khai</p>
+        </div>
         <div className="form-actions">
           <button type="button" onClick={onCancel} className="btn-secondary">
             Hủy
           </button>
-          <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Đang gửi...' : 'Gửi đánh giá'}
+          <button type="submit" disabled={isCreating} className="btn-primary">
+            {isCreating ? 'Đang gửi...' : 'Gửi đánh giá'}
           </button>
         </div>
       </form>

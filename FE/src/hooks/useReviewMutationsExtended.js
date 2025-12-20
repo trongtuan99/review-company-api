@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useReviewMutationsExtended = (companyId) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const createMutation = useMutation({
     mutationFn: ({ companyId, reviewData }) => 
@@ -10,6 +12,9 @@ export const useReviewMutationsExtended = (companyId) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reviews', companyId] });
       queryClient.invalidateQueries({ queryKey: ['company', companyId] });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ['user-activity-stats'] });
+      }
     },
   });
 

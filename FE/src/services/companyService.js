@@ -31,6 +31,22 @@ export const companyService = {
       params.append('per_page', options.perPage);
     }
     
+    if (options.filterBy) {
+      params.append('filter_by', options.filterBy);
+    }
+    
+    if (options.sortBy) {
+      params.append('sort_by', options.sortBy);
+    }
+    
+    if (options.sortOrder) {
+      params.append('sort_order', options.sortOrder);
+    }
+    
+    if (options.location) {
+      params.append('location', options.location);
+    }
+    
     if (params.toString()) {
       url += `?${params.toString()}`;
     }

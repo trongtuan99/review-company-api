@@ -13,6 +13,10 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
     phone: '',
     main_office: '',
     website: '',
+    industry: '',
+    employee_count_min: '',
+    employee_count_max: '',
+    is_hiring: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -40,7 +44,12 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
 
     try {
       setLoading(true);
-      const response = await companyService.createCompany(formData);
+      const submitData = {
+        ...formData,
+        employee_count_min: formData.employee_count_min ? parseInt(formData.employee_count_min) : null,
+        employee_count_max: formData.employee_count_max ? parseInt(formData.employee_count_max) : null,
+      };
+      const response = await companyService.createCompany(submitData);
       
       if (response.status === 'ok' || response.status === 'success') {
         const company = response.data;
@@ -126,6 +135,64 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
             onChange={handleChange}
             placeholder="https://example.com"
           />
+        </div>
+        <div className="form-group">
+          <label>Ngành nghề</label>
+          <select
+            name="industry"
+            value={formData.industry}
+            onChange={handleChange}
+            className="form-select"
+          >
+            <option value="">-- Chọn ngành nghề --</option>
+            <option value="CNTT - Phần mềm">CNTT - Phần mềm</option>
+            <option value="Giáo dục">Giáo dục</option>
+            <option value="Bán hàng/ Kinh doanh">Bán hàng/ Kinh doanh</option>
+            <option value="Bảo hiểm">Bảo hiểm</option>
+            <option value="Ngân hàng">Ngân hàng</option>
+            <option value="Sản xuất / Vận hành sản xuất">Sản xuất / Vận hành sản xuất</option>
+            <option value="Dịch vụ khách hàng">Dịch vụ khách hàng</option>
+            <option value="Kỹ thuật">Kỹ thuật</option>
+            <option value="Y tế / Chăm sóc sức khỏe">Y tế / Chăm sóc sức khỏe</option>
+            <option value="Giải trí">Giải trí</option>
+            <option value="Quản lý chất lượng (QA/QC)">Quản lý chất lượng (QA/QC)</option>
+            <option value="Điện / Điện tử / Điện lạnh">Điện / Điện tử / Điện lạnh</option>
+          </select>
+        </div>
+        <div className="form-group">
+          <label>Quy mô nhân viên</label>
+          <div className="employee-count-group">
+            <input
+              type="number"
+              name="employee_count_min"
+              value={formData.employee_count_min}
+              onChange={handleChange}
+              placeholder="Từ"
+              min="0"
+              className="employee-count-input"
+            />
+            <span className="employee-count-separator">-</span>
+            <input
+              type="number"
+              name="employee_count_max"
+              value={formData.employee_count_max}
+              onChange={handleChange}
+              placeholder="Đến"
+              min="0"
+              className="employee-count-input"
+            />
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              name="is_hiring"
+              checked={formData.is_hiring}
+              onChange={(e) => setFormData({ ...formData, is_hiring: e.target.checked })}
+            />
+            <span>Đang tuyển dụng</span>
+          </label>
         </div>
         <div className="form-actions">
           {onCancel && (

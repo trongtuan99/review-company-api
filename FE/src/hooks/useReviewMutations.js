@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { reviewService } from '../services/reviewService';
+import { useAuth } from '../contexts/AuthContext';
 
 export const useReviewMutations = (reviewId, companyId, onSuccessCallback) => {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const likeMutation = useMutation({
     mutationFn: () => reviewService.likeReview(reviewId),
@@ -16,15 +18,25 @@ export const useReviewMutations = (reviewId, companyId, onSuccessCallback) => {
             reviewData = response.data;
           }
           
+          // Update callback first to ensure state is synced
           if (onSuccessCallback && reviewData) {
             onSuccessCallback(reviewId, reviewData);
           }
         }
       }
       
-      if (companyId) {
-        queryClient.invalidateQueries({ queryKey: ['reviews', companyId] });
-      }
+      // Delay invalidate to allow callback to update state first
+      setTimeout(() => {
+        if (companyId) {
+          queryClient.invalidateQueries({ queryKey: ['reviews', companyId] });
+        }
+        if (user?.id) {
+          queryClient.invalidateQueries({ queryKey: ['user-activity-stats'] });
+        }
+      }, 100);
+    },
+    onError: (err) => {
+      // Error handling - could revert optimistic update here
     },
   });
 
@@ -40,15 +52,25 @@ export const useReviewMutations = (reviewId, companyId, onSuccessCallback) => {
             reviewData = response.data;
           }
           
+          // Update callback first to ensure state is synced
           if (onSuccessCallback && reviewData) {
             onSuccessCallback(reviewId, reviewData);
           }
         }
       }
       
-      if (companyId) {
-        queryClient.invalidateQueries({ queryKey: ['reviews', companyId] });
-      }
+      // Delay invalidate to allow callback to update state first
+      setTimeout(() => {
+        if (companyId) {
+          queryClient.invalidateQueries({ queryKey: ['reviews', companyId] });
+        }
+        if (user?.id) {
+          queryClient.invalidateQueries({ queryKey: ['user-activity-stats'] });
+        }
+      }, 100);
+    },
+    onError: (err) => {
+      // Error handling - could revert optimistic update here
     },
   });
 

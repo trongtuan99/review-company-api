@@ -22,10 +22,11 @@
 }
 
 .company-header {
-  background: var(--glassdoor-white);
-  padding: 40px 24px;
-  border-bottom: 1px solid var(--glassdoor-border);
+  background: linear-gradient(135deg, var(--glassdoor-white) 0%, var(--glassdoor-gray-bg) 100%);
+  padding: 48px 32px;
+  border-bottom: 2px solid var(--glassdoor-border);
   margin-bottom: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .company-title-section {
@@ -38,12 +39,13 @@
 }
 
 .company-header h1 {
-  font-size: 36px;
+  font-size: 42px;
   font-weight: 700;
   color: var(--glassdoor-gray);
   margin: 0;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.8px;
   flex: 1;
+  line-height: 1.2;
 }
 
 .favorite-btn {
@@ -90,55 +92,159 @@
   align-items: center;
   gap: 24px;
   flex-wrap: wrap;
+  margin-top: 8px;
 }
 
 .score-badge {
   background: linear-gradient(135deg, var(--glassdoor-green) 0%, var(--glassdoor-green-dark) 100%);
   color: white;
-  padding: 10px 20px;
-  border-radius: 24px;
+  padding: 12px 24px;
+  border-radius: 28px;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 22px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0, 168, 107, 0.3);
+}
+
+.company-meta span {
+  font-size: 16px;
+  color: var(--glassdoor-gray-light);
+  font-weight: 500;
+}
+
+.company-stats {
+  background: var(--glassdoor-white);
+  padding: 32px 24px;
+  border-bottom: 1px solid var(--glassdoor-border);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 12px;
+  border: 1px solid var(--glassdoor-border);
+  flex: 1;
+  min-width: 200px;
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: 0 4px 12px var(--glassdoor-shadow);
+  transform: translateY(-2px);
+}
+
+.stat-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--glassdoor-gray);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: var(--glassdoor-gray-light);
+  font-weight: 500;
 }
 
 .company-info {
   background: var(--glassdoor-white);
-  padding: 32px 24px;
+  padding: 40px 24px;
   border-bottom: 1px solid var(--glassdoor-border);
   margin-bottom: 0;
 }
 
+.info-section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--glassdoor-gray);
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--glassdoor-border);
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
 .info-item {
-  margin: 16px 0;
-  font-size: 16px;
-  color: var(--glassdoor-gray);
-  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 10px;
+  border: 1px solid var(--glassdoor-border);
+  transition: all 0.2s ease;
 }
 
-.info-item strong {
-  color: var(--glassdoor-gray);
-  margin-right: 12px;
+.info-item:hover {
+  box-shadow: 0 2px 8px var(--glassdoor-shadow);
+  border-color: var(--glassdoor-green);
+}
+
+.info-icon {
+  font-size: 24px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.info-label {
+  font-size: 12px;
   font-weight: 600;
+  color: var(--glassdoor-gray-light);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.info-item a {
+.info-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--glassdoor-gray);
+  line-height: 1.4;
+}
+
+.info-value.link {
   color: var(--glassdoor-green);
   text-decoration: none;
-  font-weight: 500;
   transition: color 0.2s;
 }
 
-.info-item a:hover {
+.info-value.link:hover {
   color: var(--glassdoor-green-dark);
   text-decoration: underline;
 }
 
 .reviews-section {
   background: var(--glassdoor-white);
-  padding: 40px 24px;
+  padding: 48px 32px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -147,16 +253,24 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid var(--glassdoor-border);
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 3px solid var(--glassdoor-border);
 }
 
 .reviews-header h2 {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--glassdoor-gray);
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.reviews-header h2::before {
+  content: '💬';
+  font-size: 28px;
 }
 
 /* Responsive - Mobile */
@@ -180,13 +294,25 @@
     gap: 16px;
   }
 
+  .company-stats {
+    padding: 24px 16px;
+    flex-direction: column;
+  }
+
+  .stat-card {
+    width: 100%;
+  }
+
   .company-info {
     padding: 24px 16px;
   }
 
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
   .info-item {
-    font-size: 14px;
-    margin: 12px 0;
+    padding: 16px;
   }
 
   .reviews-section {
