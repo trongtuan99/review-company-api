@@ -21,12 +21,24 @@ const WriteReview = () => {
     title: '',
     reviews_content: '',
     score: 5,
+    // Detailed ratings
+    work_environment_rating: 5,
+    salary_benefits_rating: 5,
+    management_rating: 5,
+    work_pressure_rating: 5,
+    culture_rating: 5,
+    // Job info
     job_title: '',
     custom_job_title: '',
-    is_anonymous: false,
+    employment_duration: '',
+    employment_status: 'current', // current or former
+    // Content
     pros: '',
     cons: '',
     advice: '',
+    // Options
+    is_anonymous: false,
+    would_recommend: true,
   });
   const [error, setError] = useState('');
 
@@ -66,12 +78,30 @@ const WriteReview = () => {
     'Other'
   ];
 
+  const employmentDurations = [
+    { value: 'less_than_1', label: 'Dưới 1 năm' },
+    { value: '1_to_3', label: '1 - 3 năm' },
+    { value: 'more_than_3', label: 'Trên 3 năm' },
+  ];
+
+  const ratingCriteria = [
+    { key: 'work_environment_rating', label: 'Môi trường làm việc', icon: '🏢' },
+    { key: 'salary_benefits_rating', label: 'Lương & phúc lợi', icon: '💰' },
+    { key: 'management_rating', label: 'Sếp & quản lý', icon: '👔' },
+    { key: 'work_pressure_rating', label: 'Áp lực công việc', icon: '⏰' },
+    { key: 'culture_rating', label: 'Văn hóa công ty', icon: '🎯' },
+  ];
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+  };
+
+  const handleRatingChange = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
   const handleCompanySelect = (company) => {
@@ -86,6 +116,19 @@ const WriteReview = () => {
     if (!e.target.value) {
       setSelectedCompanyId(null);
     }
+  };
+
+  // Calculate overall score from detailed ratings
+  const calculateOverallScore = () => {
+    const ratings = [
+      formData.work_environment_rating,
+      formData.salary_benefits_rating,
+      formData.management_rating,
+      formData.work_pressure_rating,
+      formData.culture_rating,
+    ];
+    const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+    return Math.round(avg);
   };
 
   const handleSubmit = async (e) => {
@@ -108,7 +151,7 @@ const WriteReview = () => {
     }
 
     try {
-      // Combine pros, cons, advice into reviews_content using special delimiters
+      // Combine all content with special delimiters
       let fullContent = formData.reviews_content;
       if (formData.pros) {
         fullContent += `\n\n[PROS]\n${formData.pros}`;
@@ -123,9 +166,18 @@ const WriteReview = () => {
       const submitData = {
         title: formData.title,
         reviews_content: fullContent,
-        score: formData.score,
+        score: calculateOverallScore(),
         job_title: formData.job_title === 'Other' ? formData.custom_job_title : formData.job_title,
         is_anonymous: formData.is_anonymous,
+        // Extended fields
+        work_environment_rating: formData.work_environment_rating,
+        salary_benefits_rating: formData.salary_benefits_rating,
+        management_rating: formData.management_rating,
+        work_pressure_rating: formData.work_pressure_rating,
+        culture_rating: formData.culture_rating,
+        employment_duration: formData.employment_duration,
+        employment_status: formData.employment_status,
+        would_recommend: formData.would_recommend,
       };
 
       await createReview({ companyId: selectedCompanyId, reviewData: submitData });
@@ -133,6 +185,31 @@ const WriteReview = () => {
     } catch (err) {
       setError(err.message || err.error || 'Không thể tạo đánh giá. Vui lòng thử lại.');
     }
+  };
+
+  const resetForm = () => {
+    setSubmitted(false);
+    setFormData({
+      title: '',
+      reviews_content: '',
+      score: 5,
+      work_environment_rating: 5,
+      salary_benefits_rating: 5,
+      management_rating: 5,
+      work_pressure_rating: 5,
+      culture_rating: 5,
+      job_title: '',
+      custom_job_title: '',
+      employment_duration: '',
+      employment_status: 'current',
+      pros: '',
+      cons: '',
+      advice: '',
+      is_anonymous: false,
+      would_recommend: true,
+    });
+    setSelectedCompanyId(null);
+    setSearchTerm('');
   };
 
   if (!isAuthenticated) {
@@ -165,22 +242,7 @@ const WriteReview = () => {
               <button onClick={() => navigate(`/companies/${selectedCompanyId}`)} className="btn-primary">
                 Xem công ty
               </button>
-              <button onClick={() => {
-                setSubmitted(false);
-                setFormData({
-                  title: '',
-                  reviews_content: '',
-                  score: 5,
-                  job_title: '',
-                  custom_job_title: '',
-                  is_anonymous: false,
-                  pros: '',
-                  cons: '',
-                  advice: '',
-                });
-                setSelectedCompanyId(null);
-                setSearchTerm('');
-              }} className="btn-secondary">
+              <button onClick={resetForm} className="btn-secondary">
                 Viết đánh giá khác
               </button>
             </div>
@@ -213,7 +275,7 @@ const WriteReview = () => {
         <form onSubmit={handleSubmit} className="review-form">
           {/* Company Selection */}
           <div className="form-section">
-            <h3>1. Chọn công ty</h3>
+            <h3>📍 Chọn công ty</h3>
             <div className="form-group company-search">
               <label>Công ty bạn muốn đánh giá *</label>
               <div className="search-container">
@@ -261,58 +323,109 @@ const WriteReview = () => {
             </div>
           </div>
 
-          {/* Rating */}
+          {/* Employment Info */}
           <div className="form-section">
-            <h3>2. Đánh giá tổng quan</h3>
+            <h3>💼 Thông tin công việc</h3>
+            <div className="form-row">
+              <div className="form-group">
+                <label>Chức danh của bạn</label>
+                <select
+                  name="job_title"
+                  value={formData.job_title}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  <option value="">-- Chọn chức danh --</option>
+                  {commonJobTitles.map((title) => (
+                    <option key={title} value={title}>{title}</option>
+                  ))}
+                </select>
+                {formData.job_title === 'Other' && (
+                  <input
+                    type="text"
+                    name="custom_job_title"
+                    value={formData.custom_job_title}
+                    onChange={handleChange}
+                    placeholder="Nhập chức danh của bạn..."
+                    className="form-input mt-2"
+                  />
+                )}
+              </div>
+              <div className="form-group">
+                <label>Thời gian làm việc</label>
+                <select
+                  name="employment_duration"
+                  value={formData.employment_duration}
+                  onChange={handleChange}
+                  className="form-select"
+                >
+                  <option value="">-- Chọn thời gian --</option>
+                  {employmentDurations.map((d) => (
+                    <option key={d.value} value={d.value}>{d.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <div className="form-group">
-              <label>Điểm đánh giá (1-10) *</label>
-              <div className="rating-container">
-                <StarRating
-                  value={formData.score}
-                  onChange={(score) => setFormData(prev => ({ ...prev, score }))}
-                />
-                <span className="rating-label">
-                  {formData.score <= 3 ? 'Không hài lòng' :
-                   formData.score <= 5 ? 'Tạm được' :
-                   formData.score <= 7 ? 'Hài lòng' :
-                   formData.score <= 9 ? 'Rất hài lòng' : 'Tuyệt vời'}
-                </span>
+              <label>Trạng thái làm việc</label>
+              <div className="radio-group">
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="employment_status"
+                    value="current"
+                    checked={formData.employment_status === 'current'}
+                    onChange={handleChange}
+                  />
+                  <span>Đang làm việc</span>
+                </label>
+                <label className="radio-label">
+                  <input
+                    type="radio"
+                    name="employment_status"
+                    value="former"
+                    checked={formData.employment_status === 'former'}
+                    onChange={handleChange}
+                  />
+                  <span>Đã nghỉ việc</span>
+                </label>
               </div>
             </div>
           </div>
 
-          {/* Job Info */}
+          {/* Detailed Ratings */}
           <div className="form-section">
-            <h3>3. Thông tin công việc</h3>
-            <div className="form-group">
-              <label>Chức danh của bạn</label>
-              <select
-                name="job_title"
-                value={formData.job_title}
-                onChange={handleChange}
-                className="form-select"
-              >
-                <option value="">-- Chọn chức danh --</option>
-                {commonJobTitles.map((title) => (
-                  <option key={title} value={title}>{title}</option>
-                ))}
-              </select>
-              {formData.job_title === 'Other' && (
-                <input
-                  type="text"
-                  name="custom_job_title"
-                  value={formData.custom_job_title}
-                  onChange={handleChange}
-                  placeholder="Nhập chức danh của bạn..."
-                  className="form-input mt-2"
-                />
-              )}
+            <h3>⭐ Đánh giá chi tiết</h3>
+            <p className="section-description">Đánh giá từng khía cạnh của công ty (1-10 điểm)</p>
+
+            <div className="detailed-ratings">
+              {ratingCriteria.map((criteria) => (
+                <div key={criteria.key} className="rating-row">
+                  <div className="rating-label-group">
+                    <span className="rating-icon">{criteria.icon}</span>
+                    <span className="rating-name">{criteria.label}</span>
+                  </div>
+                  <div className="rating-stars-container">
+                    <StarRating
+                      value={formData[criteria.key]}
+                      onChange={(value) => handleRatingChange(criteria.key, value)}
+                      size="small"
+                    />
+                    <span className="rating-value">{formData[criteria.key]}/10</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="overall-score-preview">
+              <span>Điểm tổng hợp:</span>
+              <span className="overall-value">{calculateOverallScore()}/10</span>
             </div>
           </div>
 
           {/* Review Content */}
           <div className="form-section">
-            <h3>4. Nội dung đánh giá</h3>
+            <h3>📝 Nội dung đánh giá</h3>
 
             <div className="form-group">
               <label>Tiêu đề đánh giá *</label>
@@ -343,31 +456,31 @@ const WriteReview = () => {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Ưu điểm</label>
+                <label>✅ Ưu điểm</label>
                 <textarea
                   name="pros"
                   value={formData.pros}
                   onChange={handleChange}
                   rows={3}
-                  placeholder="Những điểm tích cực..."
-                  className="form-textarea"
+                  placeholder="Những điểm tích cực của công ty..."
+                  className="form-textarea pros-textarea"
                 />
               </div>
               <div className="form-group">
-                <label>Nhược điểm</label>
+                <label>❌ Nhược điểm</label>
                 <textarea
                   name="cons"
                   value={formData.cons}
                   onChange={handleChange}
                   rows={3}
                   placeholder="Những điểm cần cải thiện..."
-                  className="form-textarea"
+                  className="form-textarea cons-textarea"
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>Lời khuyên cho ban lãnh đạo</label>
+              <label>💡 Lời khuyên cho ban lãnh đạo</label>
               <textarea
                 name="advice"
                 value={formData.advice}
@@ -379,9 +492,23 @@ const WriteReview = () => {
             </div>
           </div>
 
-          {/* Privacy */}
+          {/* Recommendation & Privacy */}
           <div className="form-section">
-            <h3>5. Tùy chọn hiển thị</h3>
+            <h3>🎯 Khuyến nghị & Tùy chọn</h3>
+
+            <div className="form-group">
+              <label className="checkbox-label recommend-checkbox">
+                <input
+                  type="checkbox"
+                  name="would_recommend"
+                  checked={formData.would_recommend}
+                  onChange={handleChange}
+                />
+                <span className="checkbox-icon">👍</span>
+                <span>Tôi khuyên bạn bè/người thân làm việc tại công ty này</span>
+              </label>
+            </div>
+
             <div className="form-group">
               <label className="checkbox-label">
                 <input
@@ -390,11 +517,11 @@ const WriteReview = () => {
                   checked={formData.is_anonymous}
                   onChange={handleChange}
                 />
+                <span className="checkbox-icon">🔒</span>
                 <span>Đánh giá ẩn danh</span>
               </label>
               <p className="form-hint">
                 Nếu chọn, tên của bạn sẽ không được hiển thị công khai.
-                Chỉ hiển thị "Người dùng ẩn danh".
               </p>
             </div>
           </div>

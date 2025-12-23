@@ -1,82 +1,44 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { userService } from '../services/userService';
-import { useFavorites, useFavoriteMutations, useUserActivityStats, useUserRecentComments } from '../hooks';
+import { useFavorites, useFavoriteMutations, useUserActivityStats, useUserRecentComments, useUserReviews } from '../hooks';
 import ProtectedRoute from '../components/ProtectedRoute';
 import ConfirmModal from '../components/ConfirmModal';
+import EditProfileModal from '../components/EditProfileModal';
 import './Profile.css';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, updateUser, refreshUser } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [companyIdToRemove, setCompanyIdToRemove] = useState(null);
-  const [activeTab, setActiveTab] = useState('favorites');
+  const [activeTab, setActiveTab] = useState('reviews');
 
-  const { data: favoritesResponse, isLoading: favoritesLoading, refetch: refetchFavorites } = useFavorites();
+  // Refresh user data on mount
+  useEffect(() => {
+    refreshUser();
+  }, []);
+
+  const { data: favoritesResponse, isLoading: favoritesLoading } = useFavorites();
   const favoriteCompanies = favoritesResponse?.data || [];
   const { removeFavoriteAsync, isRemoving } = useFavoriteMutations();
-  
-  const { data: activityStatsResponse, refetch: refetchActivityStats } = useUserActivityStats();
+
+  const { data: activityStatsResponse } = useUserActivityStats();
   const activityStats = activityStatsResponse?.data || { reviews_count: 0, replies_count: 0, likes_count: 0 };
-  
-  const { data: recentCommentsResponse, refetch: refetchRecentComments } = useUserRecentComments(10);
+
+  const { data: recentCommentsResponse } = useUserRecentComments(10);
   const recentComments = recentCommentsResponse?.data || [];
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: ''
-  });
 
-  useEffect(() => {
-    if (user) {
-      loadProfile();
-      refetchActivityStats();
-      refetchRecentComments();
-    }
-  }, [user]);
+  const { data: userReviewsResponse, isLoading: reviewsLoading, error: reviewsError, refetch: refetchUserReviews } = useUserReviews(1);
+  const userReviews = userReviewsResponse?.data || [];
 
-  const loadProfile = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      // Assuming we have a getProfile endpoint
-      // For now, use the user from context
-      setProfile(user);
-      setFormData({
-        first_name: user?.first_name || '',
-        last_name: user?.last_name || '',
-        email: user?.email || ''
-      });
-    } catch (err) {
-      setError(err.message || 'Không thể tải thông tin profile');
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Debug: Log reviews data
+  console.log('userReviewsResponse:', userReviewsResponse);
+  console.log('reviewsError:', reviewsError);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      setError('');
-      setProfile({ ...profile, ...formData });
-      setIsEditing(false);
-      alert('Cập nhật profile thành công!');
-    } catch (err) {
-      setError(err.message || 'Không thể cập nhật profile');
-    }
+  const handleProfileUpdate = (updatedUser) => {
+    updateUser && updateUser(updatedUser);
   };
 
   const handleRemoveFavoriteClick = (companyId) => {
@@ -86,11 +48,10 @@ const Profile = () => {
 
   const handleRemoveFavorite = async () => {
     if (!companyIdToRemove) return;
-    
     try {
       await removeFavoriteAsync(companyIdToRemove);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || err.error || 'Không thể xóa khỏi danh sách yêu thích';
+      const errorMessage = err.response?.data?.message || err.message || 'Không thể xóa khỏi danh sách yêu thích';
       alert(errorMessage);
     } finally {
       setCompanyIdToRemove(null);
@@ -102,263 +63,247 @@ const Profile = () => {
     navigate('/');
   };
 
-  if (loading) {
-    return <div className="loading">Đang tải...</div>;
-  }
+  const getGenderLabel = (gender) => {
+    switch (gender) {
+      case 'male': return 'Nam';
+      case 'female': return 'Nữ';
+      case 'other': return 'Khác';
+      default: return 'Chưa cập nhật';
+    }
+  };
 
   return (
     <ProtectedRoute>
-      <div className="profile-container">
-        <div className="profile-header">
-          <Link to="/" className="back-link">← Quay lại trang chủ</Link>
-          <h1>Hồ sơ của tôi</h1>
+      <div className="profile-page">
+        {/* Compact Profile Header */}
+        <div className="profile-hero">
+          <div className="profile-hero-content">
+            <div className="profile-user-info">
+              <div className="avatar-circle">
+                {user?.first_name?.[0]?.toUpperCase() || 'U'}
+              </div>
+              <div className="user-details">
+                <h1>{user?.first_name} {user?.last_name}</h1>
+                <p className="user-email">{user?.email}</p>
+                <span className="role-badge">{user?.role?.name || 'Người dùng'}</span>
+              </div>
+            </div>
+            <div className="profile-actions-top">
+              <button className="btn-edit" onClick={() => setShowEditModal(true)}>
+                Chỉnh sửa
+              </button>
+              <button className="btn-logout" onClick={handleLogout}>
+                Đăng xuất
+              </button>
+            </div>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="stats-bar">
+            <div className="stat-item">
+              <span className="stat-value">{activityStats.reviews_count || 0}</span>
+              <span className="stat-label">Đánh giá</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value">{activityStats.replies_count || 0}</span>
+              <span className="stat-label">Bình luận</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value">{activityStats.likes_count || 0}</span>
+              <span className="stat-label">Lượt thích</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-value">{favoriteCompanies.length}</span>
+              <span className="stat-label">Yêu thích</span>
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="error-message">{error}</div>
-        )}
-
-        <div className="profile-content">
-          <div className="profile-card">
-            <div className="profile-avatar">
-              <div className="avatar-circle">
-                {profile?.first_name?.[0]?.toUpperCase() || 'U'}
+        {/* Main Content */}
+        <div className="profile-main">
+          {/* Quick Info Card */}
+          <div className="quick-info-card">
+            <h3>Thông tin cá nhân</h3>
+            <div className="info-grid">
+              <div className="info-item">
+                <span className="info-label">Họ và tên</span>
+                <span className="info-value">{user?.first_name} {user?.last_name}</span>
               </div>
-              <h2>{profile?.first_name} {profile?.last_name}</h2>
-              <p className="profile-email">{profile?.email}</p>
+              <div className="info-item">
+                <span className="info-label">Email</span>
+                <span className="info-value">{user?.email}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Giới tính</span>
+                <span className="info-value">{getGenderLabel(user?.gender)}</span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Vai trò</span>
+                <span className="info-value">{user?.role?.name || 'Người dùng'}</span>
+              </div>
             </div>
-
-            {!isEditing ? (
-              <div className="profile-info">
-                <div className="info-item">
-                  <label>Họ và tên đệm</label>
-                  <p>{profile?.first_name || 'Chưa cập nhật'}</p>
-                </div>
-                <div className="info-item">
-                  <label>Tên</label>
-                  <p>{profile?.last_name || 'Chưa cập nhật'}</p>
-                </div>
-                <div className="info-item">
-                  <label>Email</label>
-                  <p>{profile?.email || 'Chưa cập nhật'}</p>
-                </div>
-                <div className="info-item">
-                  <label>Vai trò</label>
-                  <p className="role-badge">{profile?.role?.name || 'Người dùng'}</p>
-                </div>
-                <div className="profile-actions">
-                  <button
-                    className="btn-primary"
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Chỉnh sửa hồ sơ
-                  </button>
-                  <button
-                    className="btn-secondary"
-                    onClick={handleLogout}
-                  >
-                    Đăng xuất
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <form className="profile-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>Họ và tên đệm *</label>
-                  <input
-                    type="text"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Nhập họ và tên đệm"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Tên *</label>
-                  <input
-                    type="text"
-                    name="last_name"
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    required
-                    placeholder="Nhập tên"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email *</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    placeholder="Nhập email"
-                    disabled
-                  />
-                  <small>Email không thể thay đổi</small>
-                </div>
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="btn-secondary"
-                    onClick={() => {
-                      setIsEditing(false);
-                      setFormData({
-                        first_name: profile?.first_name || '',
-                        last_name: profile?.last_name || '',
-                        email: profile?.email || ''
-                      });
-                    }}
-                  >
-                    Hủy
-                  </button>
-                  <button type="submit" className="btn-primary">
-                    Lưu thay đổi
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-
-          <div className="profile-stats">
-            <h3>Hoạt động của tôi</h3>
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-value">{activityStats.reviews_count || 0}</div>
-                <div className="stat-label">ĐÁNH GIÁ ĐÃ VIẾT</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-value">{activityStats.replies_count || 0}</div>
-                <div className="stat-label">BÌNH LUẬN ĐÃ VIẾT</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-value">{activityStats.likes_count || 0}</div>
-                <div className="stat-label">LƯỢT THÍCH</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-value">{favoriteCompanies.length}</div>
-                <div className="stat-label">CÔNG TY YÊU THÍCH</div>
-              </div>
+            <div className="quick-actions">
+              <Link to="/write-review" className="quick-action-btn primary">
+                Viết đánh giá
+              </Link>
+              <Link to="/companies" className="quick-action-btn secondary">
+                Khám phá công ty
+              </Link>
             </div>
           </div>
 
-          <div className="profile-tabs-section">
+          {/* Tabs Section */}
+          <div className="profile-tabs-container">
             <div className="profile-tabs">
               <button
-                className={`profile-tab ${activeTab === 'favorites' ? 'active' : ''}`}
-                onClick={() => setActiveTab('favorites')}
+                className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+                onClick={() => setActiveTab('reviews')}
               >
-                ❤️ Công ty yêu thích ({favoriteCompanies.length})
+                Đánh giá của tôi ({userReviews.length})
               </button>
               <button
-                className={`profile-tab ${activeTab === 'comments' ? 'active' : ''}`}
+                className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
+                onClick={() => setActiveTab('favorites')}
+              >
+                Công ty yêu thích ({favoriteCompanies.length})
+              </button>
+              <button
+                className={`tab-btn ${activeTab === 'comments' ? 'active' : ''}`}
                 onClick={() => setActiveTab('comments')}
               >
-                💬 Bình luận gần đây ({recentComments.length})
+                Bình luận ({recentComments.length})
               </button>
             </div>
 
-            {activeTab === 'favorites' && (
-              <div className="favorite-companies-section">
-                {favoritesLoading ? (
-                  <div className="loading">Đang tải...</div>
-                ) : favoriteCompanies.length === 0 ? (
-                  <div className="empty-favorites">
-                    <p>Bạn chưa yêu thích công ty nào</p>
-                    <Link to="/companies" className="browse-link">
-                      Khám phá công ty →
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="favorite-companies-grid">
-                    {favoriteCompanies.map((company) => (
-                      <div key={company.id} className="favorite-company-card">
-                        <Link
-                          to={`/companies/${company.id}`}
-                          className="favorite-company-link"
-                        >
-                          <div className="favorite-company-header">
-                            <h4>{company.name}</h4>
-                            <div className="favorite-company-score">
-                              ⭐ {company.avg_score?.toFixed(1) || '0.0'}
-                            </div>
+            <div className="tab-content">
+              {activeTab === 'reviews' && (
+                <div className="reviews-tab">
+                  {reviewsLoading ? (
+                    <div className="loading-state">Đang tải...</div>
+                  ) : reviewsError ? (
+                    <div className="empty-state">
+                      <p>Không thể tải đánh giá: {reviewsError.message || 'Lỗi không xác định'}</p>
+                      <button onClick={() => refetchUserReviews()} className="cta-link">Thử lại</button>
+                    </div>
+                  ) : userReviews.length === 0 ? (
+                    <div className="empty-state">
+                      <p>Bạn chưa viết đánh giá nào</p>
+                      <Link to="/write-review" className="cta-link">Viết đánh giá đầu tiên →</Link>
+                    </div>
+                  ) : (
+                    <div className="reviews-list">
+                      {userReviews.map((review) => (
+                        <div key={review.id} className="review-card">
+                          <div className="review-card-header">
+                            <Link to={`/companies/${review.company_id}`} className="company-name">
+                              {review.company?.name || 'Công ty'}
+                            </Link>
+                            <div className="review-score">⭐ {review.score}/10</div>
                           </div>
-                          <div className="favorite-company-info">
-                            <p>{company.total_reviews || 0} đánh giá</p>
-                            {company.main_office && (
-                              <p className="location">📍 {company.main_office}</p>
+                          <h4 className="review-title">{review.title}</h4>
+                          <p className="review-excerpt">
+                            {review.reviews_content?.substring(0, 150)}
+                            {review.reviews_content?.length > 150 ? '...' : ''}
+                          </p>
+                          <div className="review-card-footer">
+                            <span className="review-date">
+                              {new Date(review.created_at).toLocaleDateString('vi-VN')}
+                            </span>
+                            <div className="review-stats">
+                              <span>👍 {review.likes_count || 0}</span>
+                              <span>👎 {review.dislikes_count || 0}</span>
+                            </div>
+                            {review.status && (
+                              <span className={`status-badge ${review.status}`}>
+                                {review.status === 'pending' && 'Chờ duyệt'}
+                                {review.status === 'approved' && 'Đã duyệt'}
+                                {review.status === 'rejected' && 'Từ chối'}
+                              </span>
                             )}
                           </div>
-                        </Link>
-                        <button
-                          className="remove-favorite-btn"
-                          onClick={() => handleRemoveFavoriteClick(company.id)}
-                          title="Xóa khỏi yêu thích"
-                          disabled={isRemoving}
-                        >
-                          {isRemoving ? '...' : '✕'}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
 
-            {activeTab === 'comments' && (
-              <div className="recent-comments-section">
-                {recentComments.length === 0 ? (
-                  <div className="empty-comments">
-                    <p>Bạn chưa có bình luận nào</p>
-                    <Link to="/companies" className="browse-link">
-                      Khám phá công ty và bình luận →
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="comments-list">
-                    {recentComments.map((reply) => (
-                      <div key={reply.id} className="comment-item">
-                        <div className="comment-header">
-                          <div className="comment-meta">
+              {activeTab === 'favorites' && (
+                <div className="favorites-tab">
+                  {favoritesLoading ? (
+                    <div className="loading-state">Đang tải...</div>
+                  ) : favoriteCompanies.length === 0 ? (
+                    <div className="empty-state">
+                      <p>Bạn chưa yêu thích công ty nào</p>
+                      <Link to="/companies" className="cta-link">Khám phá công ty →</Link>
+                    </div>
+                  ) : (
+                    <div className="favorites-grid">
+                      {favoriteCompanies.map((company) => (
+                        <div key={company.id} className="favorite-card">
+                          <Link to={`/companies/${company.id}`} className="favorite-link">
+                            <div className="favorite-header">
+                              <h4>{company.name}</h4>
+                              <span className="favorite-score">⭐ {company.avg_score?.toFixed(1) || '0.0'}</span>
+                            </div>
+                            <div className="favorite-info">
+                              <span>{company.total_reviews || 0} đánh giá</span>
+                              {company.main_office && <span>📍 {company.main_office}</span>}
+                            </div>
+                          </Link>
+                          <button
+                            className="remove-btn"
+                            onClick={() => handleRemoveFavoriteClick(company.id)}
+                            disabled={isRemoving}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {activeTab === 'comments' && (
+                <div className="comments-tab">
+                  {recentComments.length === 0 ? (
+                    <div className="empty-state">
+                      <p>Bạn chưa có bình luận nào</p>
+                      <Link to="/companies" className="cta-link">Khám phá và bình luận →</Link>
+                    </div>
+                  ) : (
+                    <div className="comments-list">
+                      {recentComments.map((reply) => (
+                        <div key={reply.id} className="comment-card">
+                          <div className="comment-header">
                             <span className="comment-date">
-                              {new Date(reply.created_at).toLocaleDateString('vi-VN', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
+                              {new Date(reply.created_at).toLocaleDateString('vi-VN')}
                             </span>
                             {reply.review && (
-                              <Link
-                                to={`/companies/${reply.review.company_id}`}
-                                className="comment-company-link"
-                              >
-                                📝 {reply.review.title || 'Đánh giá'}
+                              <Link to={`/companies/${reply.review.company_id}`} className="comment-review-link">
+                                {reply.review.title || 'Đánh giá'}
                               </Link>
                             )}
                           </div>
+                          <p className="comment-content">{reply.content}</p>
                         </div>
-                        <div className="comment-content">
-                          <p>{reply.content}</p>
-                        </div>
-                        {reply.review && (
-                          <Link
-                            to={`/companies/${reply.review.company_id}`}
-                            className="comment-view-link"
-                          >
-                            Xem đánh giá →
-                          </Link>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Modals */}
+        <EditProfileModal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          user={user}
+          onUpdate={handleProfileUpdate}
+        />
 
         <ConfirmModal
           isOpen={showConfirmModal}
@@ -368,7 +313,7 @@ const Profile = () => {
           }}
           onConfirm={handleRemoveFavorite}
           title="Xóa khỏi danh sách yêu thích"
-          message="Bạn có chắc chắn muốn xóa công ty này khỏi danh sách yêu thích?"
+          message="Bạn có chắc chắn muốn xóa công ty này?"
           confirmText="Xóa"
           cancelText="Hủy"
           type="danger"
@@ -379,4 +324,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

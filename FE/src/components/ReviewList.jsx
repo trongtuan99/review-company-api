@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { reviewService } from '../services/reviewService';
 import ReviewItem from './ReviewItem';
 import './ReviewList.css';
 
-const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, onUpdate, companyId }) => {
+const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, onUpdate, companyId, filters = {} }) => {
   const { isAuthenticated } = useAuth();
   const [reviews, setReviews] = useState(initialReviews || []);
   const [page, setPage] = useState(1);
@@ -30,13 +30,51 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
     }
   }, [initialReviews, initialPagination]);
 
+  // Client-side filtering and sorting as fallback
+  const filteredAndSortedReviews = useMemo(() => {
+    let result = [...reviews];
+
+    // Apply score filter
+    if (filters.minScore !== undefined) {
+      result = result.filter(r => r.score >= filters.minScore);
+    }
+    if (filters.maxScore !== undefined) {
+      result = result.filter(r => r.score <= filters.maxScore);
+    }
+
+    // Apply sorting
+    if (filters.sortBy) {
+      result.sort((a, b) => {
+        let aVal, bVal;
+
+        if (filters.sortBy === 'created_at') {
+          aVal = new Date(a.created_at).getTime();
+          bVal = new Date(b.created_at).getTime();
+        } else if (filters.sortBy === 'score') {
+          aVal = a.score || 0;
+          bVal = b.score || 0;
+        } else {
+          return 0;
+        }
+
+        if (filters.sortOrder === 'desc') {
+          return bVal - aVal;
+        } else {
+          return aVal - bVal;
+        }
+      });
+    }
+
+    return result;
+  }, [reviews, filters]);
+
   const loadMoreReviews = async () => {
     if (loading || !hasMore) return;
 
     try {
       setLoading(true);
       const nextPage = page + 1;
-      const response = await reviewService.getReviews(companyId, nextPage);
+      const response = await reviewService.getReviews(companyId, nextPage, 10, filters);
       
       if (response.status === 'ok' || response.status === 'success') {
         const newReviews = response.data || [];
@@ -85,9 +123,18 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
     );
   }
 
+  // Show message if all reviews are filtered out
+  if (filteredAndSortedReviews.length === 0) {
+    return (
+      <div className="empty-reviews">
+        <p>Không có đánh giá nào phù hợp với bộ lọc.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="review-list">
-      {reviews.map((review) => (
+      {filteredAndSortedReviews.map((review) => (
         <ReviewItem
           key={review.id}
           review={review}

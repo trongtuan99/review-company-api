@@ -26,5 +26,10 @@ export const userService = {
   getRecentComments: async (limit = 10) => {
     return await apiClient.get(`/user/recent_comments?limit=${limit}`);
   },
+
+  // Get user's reviews (current user)
+  getMyReviews: async (page = 1, perPage = 10) => {
+    return await apiClient.get(`/user/my_reviews?page=${page}&per_page=${perPage}`);
+  },
 };
 

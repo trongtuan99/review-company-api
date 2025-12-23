@@ -29,6 +29,14 @@ apiClient.interceptors.request.use(
 
 apiClient.interceptors.response.use(
   (response) => {
+    // Check if API returned success: false (backend error response)
+    if (response.data && response.data.success === false) {
+      return Promise.reject({
+        message: response.data.message || 'Có lỗi xảy ra',
+        error: 'API Error',
+        data: response.data,
+      });
+    }
     return response.data;
   },
   (error) => {

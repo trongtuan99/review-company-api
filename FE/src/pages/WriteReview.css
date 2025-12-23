@@ -347,6 +347,163 @@
   padding-left: 28px;
 }
 
+/* Checkbox with Icon */
+.checkbox-label .checkbox-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.recommend-checkbox {
+  padding: 15px 20px;
+  background: var(--glassdoor-green-light);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.recommend-checkbox:hover {
+  border-color: var(--glassdoor-green);
+}
+
+.recommend-checkbox input:checked + .checkbox-icon + span {
+  color: var(--glassdoor-green);
+  font-weight: 600;
+}
+
+/* Radio Group */
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.radio-label:hover {
+  border-color: var(--glassdoor-green);
+}
+
+.radio-label input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--glassdoor-green);
+}
+
+.radio-label input[type="radio"]:checked + span {
+  color: var(--glassdoor-green);
+  font-weight: 600;
+}
+
+/* Section Description */
+.section-description {
+  color: var(--glassdoor-gray-light);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+  margin-top: -10px;
+}
+
+/* Detailed Ratings */
+.detailed-ratings {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.rating-row:hover {
+  background: var(--glassdoor-green-light);
+}
+
+.rating-label-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rating-icon {
+  font-size: 1.3rem;
+}
+
+.rating-name {
+  font-weight: 500;
+  color: var(--glassdoor-gray);
+}
+
+.rating-stars-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.rating-value {
+  font-weight: 600;
+  color: var(--glassdoor-green);
+  min-width: 40px;
+  text-align: right;
+  font-size: 0.95rem;
+}
+
+/* Overall Score Preview */
+.overall-score-preview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20px;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, var(--glassdoor-green-light) 0%, var(--glassdoor-blue-light) 100%);
+  border-radius: 10px;
+  border: 2px solid var(--glassdoor-green);
+}
+
+.overall-score-preview span:first-child {
+  font-weight: 500;
+  color: var(--glassdoor-gray);
+}
+
+.overall-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--glassdoor-green);
+}
+
+/* Pros & Cons Textareas */
+.pros-textarea {
+  border-left: 4px solid #22c55e;
+}
+
+.pros-textarea:focus {
+  border-left: 4px solid #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+.cons-textarea {
+  border-left: 4px solid #ef4444;
+}
+
+.cons-textarea:focus {
+  border-left: 4px solid #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
 /* Form Actions */
 .form-actions {
   display: flex;
@@ -358,6 +515,10 @@
 }
 
 @media (max-width: 768px) {
+  .write-review-page {
+    padding: 20px 15px;
+  }
+
   .page-header h1 {
     font-size: 1.6rem;
   }
@@ -387,5 +548,48 @@
   .guidelines-reminder {
     flex-direction: column;
     text-align: center;
+  }
+
+  /* Radio Group Mobile */
+  .radio-group {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .radio-label {
+    padding: 10px 15px;
+  }
+
+  /* Detailed Ratings Mobile */
+  .rating-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .rating-label-group {
+    justify-content: flex-start;
+  }
+
+  .rating-stars-container {
+    justify-content: space-between;
+    padding-left: 35px;
+  }
+
+  /* Overall Score Mobile */
+  .overall-score-preview {
+    flex-direction: column;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .overall-value {
+    font-size: 1.6rem;
+  }
+
+  /* Recommend Checkbox Mobile */
+  .recommend-checkbox {
+    padding: 12px 15px;
   }
 }

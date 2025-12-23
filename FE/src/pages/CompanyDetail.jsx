@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useCompany, useReviews, useFavoriteStatus, useFavoriteMutations } from '../hooks';
@@ -11,6 +11,42 @@ const CompanyDetail = () => {
   const { isAuthenticated } = useAuth();
   const [showReviewForm, setShowReviewForm] = useState(false);
 
+  // Filter states
+  const [scoreFilter, setScoreFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('newest');
+
+  // Build filters object
+  const filters = useMemo(() => {
+    const f = {};
+
+    // Score filter
+    if (scoreFilter === 'high') {
+      f.minScore = 8;
+    } else if (scoreFilter === 'medium') {
+      f.minScore = 5;
+      f.maxScore = 7;
+    } else if (scoreFilter === 'low') {
+      f.maxScore = 4;
+    }
+
+    // Sort filter
+    if (sortBy === 'newest') {
+      f.sortBy = 'created_at';
+      f.sortOrder = 'desc';
+    } else if (sortBy === 'oldest') {
+      f.sortBy = 'created_at';
+      f.sortOrder = 'asc';
+    } else if (sortBy === 'highest') {
+      f.sortBy = 'score';
+      f.sortOrder = 'desc';
+    } else if (sortBy === 'lowest') {
+      f.sortBy = 'score';
+      f.sortOrder = 'asc';
+    }
+
+    return f;
+  }, [scoreFilter, sortBy]);
+
   const { 
     data: companyResponse, 
     isLoading: companyLoading, 
@@ -18,11 +54,11 @@ const CompanyDetail = () => {
     refetch: refetchCompany 
   } = useCompany(id);
 
-  const { 
-    data: reviewsResponse, 
+  const {
+    data: reviewsResponse,
     isLoading: reviewsLoading,
-    refetch: refetchReviews 
-  } = useReviews(id, 1);
+    refetch: refetchReviews
+  } = useReviews(id, 1, filters);
 
   const { 
     data: favoriteStatusResponse,
@@ -150,7 +186,83 @@ const CompanyDetail = () => {
             <div className="stat-label">Tổng đánh giá</div>
           </div>
         </div>
+        <div className="stat-card recommend-card">
+          <div className="stat-icon">👍</div>
+          <div className="stat-content">
+            <div className="stat-value">{company.recommend_rate ? `${Math.round(company.recommend_rate)}%` : 'N/A'}</div>
+            <div className="stat-label">Khuyên bạn bè</div>
+          </div>
+        </div>
       </div>
+
+      {/* Detailed Ratings Section */}
+      {(company.avg_work_environment || company.avg_salary_benefits || company.avg_management || company.avg_work_pressure || company.avg_culture) && (
+        <div className="detailed-ratings-section">
+          <h3 className="info-section-title">Đánh giá chi tiết</h3>
+          <div className="ratings-grid">
+            {company.avg_work_environment > 0 && (
+              <div className="rating-bar-item">
+                <div className="rating-bar-label">
+                  <span className="rating-bar-icon">🏢</span>
+                  <span>Môi trường làm việc</span>
+                </div>
+                <div className="rating-bar-container">
+                  <div className="rating-bar" style={{ width: `${(company.avg_work_environment / 10) * 100}%` }}></div>
+                </div>
+                <span className="rating-bar-value">{company.avg_work_environment?.toFixed(1)}</span>
+              </div>
+            )}
+            {company.avg_salary_benefits > 0 && (
+              <div className="rating-bar-item">
+                <div className="rating-bar-label">
+                  <span className="rating-bar-icon">💰</span>
+                  <span>Lương & phúc lợi</span>
+                </div>
+                <div className="rating-bar-container">
+                  <div className="rating-bar" style={{ width: `${(company.avg_salary_benefits / 10) * 100}%` }}></div>
+                </div>
+                <span className="rating-bar-value">{company.avg_salary_benefits?.toFixed(1)}</span>
+              </div>
+            )}
+            {company.avg_management > 0 && (
+              <div className="rating-bar-item">
+                <div className="rating-bar-label">
+                  <span className="rating-bar-icon">👔</span>
+                  <span>Sếp & quản lý</span>
+                </div>
+                <div className="rating-bar-container">
+                  <div className="rating-bar" style={{ width: `${(company.avg_management / 10) * 100}%` }}></div>
+                </div>
+                <span className="rating-bar-value">{company.avg_management?.toFixed(1)}</span>
+              </div>
+            )}
+            {company.avg_work_pressure > 0 && (
+              <div className="rating-bar-item">
+                <div className="rating-bar-label">
+                  <span className="rating-bar-icon">⏰</span>
+                  <span>Áp lực công việc</span>
+                </div>
+                <div className="rating-bar-container">
+                  <div className="rating-bar" style={{ width: `${(company.avg_work_pressure / 10) * 100}%` }}></div>
+                </div>
+                <span className="rating-bar-value">{company.avg_work_pressure?.toFixed(1)}</span>
+              </div>
+            )}
+            {company.avg_culture > 0 && (
+              <div className="rating-bar-item">
+                <div className="rating-bar-label">
+                  <span className="rating-bar-icon">🎯</span>
+                  <span>Văn hóa công ty</span>
+                </div>
+                <div className="rating-bar-container">
+                  <div className="rating-bar" style={{ width: `${(company.avg_culture / 10) * 100}%` }}></div>
+                </div>
+                <span className="rating-bar-value">{company.avg_culture?.toFixed(1)}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <div className="company-info">
         <h3 className="info-section-title">Thông tin công ty</h3>
@@ -196,7 +308,7 @@ const CompanyDetail = () => {
 
       <div className="reviews-section">
         <div className="reviews-header">
-          <h2>Đánh giá</h2>
+          <h2>Đánh giá ({company.total_reviews || 0})</h2>
           {isAuthenticated && (
             <button
               className="btn-primary"
@@ -207,6 +319,52 @@ const CompanyDetail = () => {
           )}
         </div>
 
+        {/* Review Filters */}
+        <div className="review-filters">
+          <div className="filter-group">
+            <label>Điểm đánh giá:</label>
+            <div className="filter-buttons">
+              <button
+                className={`filter-btn ${scoreFilter === 'all' ? 'active' : ''}`}
+                onClick={() => setScoreFilter('all')}
+              >
+                Tất cả
+              </button>
+              <button
+                className={`filter-btn ${scoreFilter === 'high' ? 'active' : ''}`}
+                onClick={() => setScoreFilter('high')}
+              >
+                Cao (8-10)
+              </button>
+              <button
+                className={`filter-btn ${scoreFilter === 'medium' ? 'active' : ''}`}
+                onClick={() => setScoreFilter('medium')}
+              >
+                Trung bình (5-7)
+              </button>
+              <button
+                className={`filter-btn ${scoreFilter === 'low' ? 'active' : ''}`}
+                onClick={() => setScoreFilter('low')}
+              >
+                Thấp (1-4)
+              </button>
+            </div>
+          </div>
+          <div className="filter-group">
+            <label>Sắp xếp:</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="filter-select"
+            >
+              <option value="newest">Mới nhất</option>
+              <option value="oldest">Cũ nhất</option>
+              <option value="highest">Điểm cao nhất</option>
+              <option value="lowest">Điểm thấp nhất</option>
+            </select>
+          </div>
+        </div>
+
         {showReviewForm && isAuthenticated && (
           <CreateReviewForm
             companyId={id}
@@ -215,14 +373,15 @@ const CompanyDetail = () => {
           />
         )}
 
-        <ReviewList 
-          reviews={reviews} 
+        <ReviewList
+          reviews={reviews}
           pagination={reviewsPagination}
           onUpdate={() => {
             refetchReviews();
             refetchCompany();
-          }} 
-          companyId={id} 
+          }}
+          companyId={id}
+          filters={filters}
         />
       </div>
     </div>

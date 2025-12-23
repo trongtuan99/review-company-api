@@ -1,9 +1,10 @@
 class Api::V1::ReviewController < ApplicationController
-  around_action :with_transaction, except: %i[index recent]
-  before_action :authenticate_user!, except: %i[index recent]
+  around_action :with_transaction, except: %i[index recent all]
+  before_action :authenticate_user!, except: %i[index recent all]
   before_action :get_company, only: [:create, :index]
   before_action :get_review, only: [:update, :delete_review, :like, :dislike]
   before_action :validate_update, only: :update
+  before_action :validate_delete_permission, only: :delete_review
   before_action :get_like_record, only: [:like, :dislike]
 
   def index
@@ -70,12 +71,67 @@ class Api::V1::ReviewController < ApplicationController
                     .order(created_at: :desc)
                     .limit(limit)
                     .includes(:company)
-    
+
     render json: json_with_success(
-      data: reviews, 
+      data: reviews,
       default_serializer: ReviewSerializer,
       options: { scope: current_user }
     )
+  end
+
+  # Get all reviews with pagination (for admin)
+  def all
+    page = params[:page]&.to_i || 1
+    per_page = params[:per_page]&.to_i || 10
+    status = params[:status]
+    search = params[:q] || params[:search]
+    sort_by = params[:sort_by] || 'created_at'
+    sort_order = params[:sort_order] || 'desc'
+
+    reviews_query = Review.where(is_deleted: false).includes(:company, :user)
+
+    # Filter by status
+    if status.present? && status != 'all'
+      reviews_query = reviews_query.where(status: status)
+    end
+
+    # Search by title, content, or company name
+    if search.present?
+      reviews_query = reviews_query.joins(:company).where(
+        "reviews.title ILIKE :q OR reviews.reviews_content ILIKE :q OR companies.name ILIKE :q",
+        q: "%#{search}%"
+      )
+    end
+
+    total_count = reviews_query.count
+
+    # Sorting
+    case sort_by
+    when 'score'
+      reviews_query = reviews_query.order(score: sort_order.to_sym, created_at: :desc)
+    when 'total_like'
+      reviews_query = reviews_query.order(total_like: sort_order.to_sym, created_at: :desc)
+    else
+      reviews_query = reviews_query.order(created_at: sort_order.to_sym)
+    end
+
+    offset = (page - 1) * per_page
+    data = reviews_query.offset(offset).limit(per_page)
+
+    response_data = json_with_success(
+      data: data,
+      default_serializer: ReviewSerializer,
+      options: { scope: current_user }
+    )
+
+    response_data[:pagination] = {
+      page: page,
+      per_page: per_page,
+      total: total_count,
+      total_pages: (total_count.to_f / per_page).ceil
+    }
+
+    render json: response_data
   end
 
   private
@@ -143,4 +199,11 @@ class Api::V1::ReviewController < ApplicationController
     @like_record = Like.get_like_review_by_user_id(params[:id], current_user.id).first
   end
 
+  def validate_delete_permission
+    is_owner = @review.user_id == current_user.id
+    is_admin = current_user.role&.admin?
+    unless is_owner || is_admin
+      render json: json_with_error(message: I18n.t("controller.base.not_permission"))
+    end
+  end
 end

@@ -26,20 +26,31 @@ module ApiRoutes
             end
             collection do
               get :recent
+              get :all
             end
           end
 
           resources :reply, only: %i[index create update destroy] do
           end
 
-          resources :user, only: %i[index] do
+          resources :user, only: %i[index create] do
             member do
               put :delete_user
               put :update_profile
+              put :update_role
             end
             collection do
               get :activity_stats
               get :recent_comments
+              get :my_reviews
+              get :all
+              get :stats
+            end
+          end
+
+          resources :role, only: %i[index create update] do
+            member do
+              put :delete_role
             end
           end
 

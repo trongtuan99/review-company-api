@@ -2,7 +2,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import MainLayout from './components/MainLayout';
+import AdminLayout from './components/AdminLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -17,6 +19,8 @@ import Guidelines from './pages/Guidelines';
 import Contact from './pages/Contact';
 import Sitemap from './pages/Sitemap';
 import WriteReview from './pages/WriteReview';
+import ReviewDetail from './pages/ReviewDetail';
+import { AdminDashboard, AdminReviews, AdminUsers, AdminCompanies, AdminRoles } from './pages/admin';
 import { API_BASE_URL } from './config/api';
 import './App.css';
 
@@ -38,25 +42,77 @@ function App() {
       <AuthProvider>
         <Router>
         <div className="app">
-          <MainLayout>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/" element={<Home />} />
-              <Route path="/companies" element={<AllCompanies />} />
-              <Route path="/companies/:id" element={<CompanyDetail />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/guidelines" element={<Guidelines />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/sitemap" element={<Sitemap />} />
-              <Route path="/write-review" element={<WriteReview />} />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </MainLayout>
+          <Routes>
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminDashboard />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/reviews"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminReviews />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminUsers />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/companies"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminCompanies />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/roles"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminRoles />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+
+            {/* Public Routes */}
+            <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+            <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+            <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+            <Route path="/companies" element={<MainLayout><AllCompanies /></MainLayout>} />
+            <Route path="/companies/:id" element={<MainLayout><CompanyDetail /></MainLayout>} />
+            <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+            <Route path="/faq" element={<MainLayout><FAQ /></MainLayout>} />
+            <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+            <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
+            <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
+            <Route path="/guidelines" element={<MainLayout><Guidelines /></MainLayout>} />
+            <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+            <Route path="/sitemap" element={<MainLayout><Sitemap /></MainLayout>} />
+            <Route path="/write-review" element={<MainLayout><WriteReview /></MainLayout>} />
+            <Route path="/reviews/:id" element={<MainLayout><ReviewDetail /></MainLayout>} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
           {isDevelopment && (
             <div style={{
               position: 'fixed',

@@ -5,7 +5,7 @@ import ThemeToggle from './ThemeToggle';
 import './Navbar.css';
 
 const Navbar = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -58,6 +58,15 @@ const Navbar = () => {
                   >
                     👤 Hồ sơ của tôi
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="user-menu-item admin-link"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      ⚙️ Quản trị Admin
+                    </Link>
+                  )}
                   <button
                     className="user-menu-item"
                     onClick={handleLogout}
@@ -126,6 +135,15 @@ const Navbar = () => {
               >
                 Hồ sơ của tôi
               </Link>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="mobile-menu-item admin-link"
+                  onClick={() => setShowMenu(false)}
+                >
+                  ⚙️ Quản trị Admin
+                </Link>
+              )}
               <button
                 className="mobile-menu-item"
                 onClick={handleLogout}

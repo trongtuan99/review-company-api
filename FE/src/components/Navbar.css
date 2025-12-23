@@ -149,6 +149,26 @@
   color: var(--glassdoor-green);
 }
 
+.user-menu-item.admin-link {
+  color: #7c3aed;
+  border-top: 1px solid var(--glassdoor-border);
+}
+
+.user-menu-item.admin-link:hover {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.mobile-menu-item.admin-link {
+  color: #7c3aed;
+  font-weight: 600;
+}
+
+.mobile-menu-item.admin-link:hover {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
 .mobile-menu {
   display: none;
   flex-direction: column;

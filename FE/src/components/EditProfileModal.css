@@ -1,0 +1,199 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.edit-profile-modal {
+  background: var(--glassdoor-white);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px var(--glassdoor-shadow);
+  border: 1px solid var(--glassdoor-border);
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--glassdoor-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--glassdoor-gray);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--glassdoor-gray-light);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close:hover {
+  color: var(--glassdoor-gray);
+}
+
+.modal-error {
+  margin: 16px 24px 0;
+  padding: 12px 16px;
+  background: #fee2e2;
+  color: #dc2626;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+[data-theme="dark"] .modal-error {
+  background: rgba(254, 226, 226, 0.2);
+  color: #f87171;
+}
+
+.edit-profile-form {
+  padding: 24px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.edit-profile-form .form-group {
+  margin-bottom: 20px;
+}
+
+.edit-profile-form label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  margin-bottom: 8px;
+}
+
+.edit-profile-form input,
+.edit-profile-form select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 15px;
+  color: var(--glassdoor-gray);
+  background: var(--input-bg, var(--glassdoor-white));
+  transition: all 0.2s;
+}
+
+.edit-profile-form input:focus,
+.edit-profile-form select:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px rgba(0, 168, 107, 0.1);
+}
+
+.edit-profile-form input.disabled {
+  background: var(--glassdoor-gray-bg);
+  color: var(--glassdoor-gray-light);
+  cursor: not-allowed;
+}
+
+.edit-profile-form small {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--glassdoor-gray-light);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--glassdoor-border);
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px 20px;
+  background: var(--glassdoor-gray-bg);
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: var(--glassdoor-border);
+}
+
+.btn-save {
+  flex: 1;
+  padding: 12px 20px;
+  background: var(--glassdoor-green);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-save:hover {
+  background: var(--glassdoor-green-dark);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .edit-profile-modal {
+    width: 95%;
+    margin: 16px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-header {
+    padding: 16px 20px;
+  }
+
+  .edit-profile-form {
+    padding: 20px;
+  }
+}
