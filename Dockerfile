@@ -1,25 +1,36 @@
 FROM ruby:3.1.2
 
-ENV RAILS_ENV production
-ENV INSTALL_PATH /var/www/html/review-company
+ENV RAILS_ENV=development
+ENV INSTALL_PATH=/var/www/html/review-company
+ENV BUNDLE_PATH=/usr/local/bundle
 
-# Run rails with puma
-CMD rails s
-EXPOSE 3000
 WORKDIR $INSTALL_PATH
 
-
+# Install system dependencies
 RUN apt-get update -qq && \
-    apt-get install -y build-essential software-properties-common libpq-dev nodejs telnet vim && \
-    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-    echo "deb [arch=amd64] http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list.d/pgdg.list && \
-    apt-get update -qq && \
-    apt-get install -y postgresql-client && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    postgresql-client \
+    vim \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY Gemfile .
-COPY Gemfile.lock .
-RUN gem install bundler:2.2.4
-RUN bundle config set without 'development'
-RUN bundle install --jobs=3 --retry=3 && mkdir -p log
+# Install bundler
+RUN gem install bundler:2.4.0
+
+# Copy Gemfile first for layer caching
+COPY Gemfile Gemfile.lock ./
+
+# Install gems
+RUN bundle install --jobs=4 --retry=3
+
+# Copy application code
 COPY . .
+
+# Create required directories
+RUN mkdir -p log tmp/pids tmp/cache tmp/sockets
+
+EXPOSE 3000
+
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]

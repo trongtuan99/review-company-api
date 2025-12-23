@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Logs
+log/*
+tmp/*
+
+# Node modules (for FE)
+FE/node_modules
+
+# Test and development files
+spec/
+.rspec
+coverage/
+
+# IDE/Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Claude/AI configs
+.claude/
+
+# Environment files (use docker-compose environment instead)
+.env
+.env.local
+.env.*.local
+
+# Documentation
+docs/
+plans/
+*.md
+!README.md
+
+# Storage
+storage/*
+
+# Misc
+.byebug_history
