@@ -1,11 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import './Terms.css';
 
 const Terms = () => {
+  const { t, i18n } = useTranslation();
+  const lastUpdatedDate = new Date('2025-12-23').toLocaleDateString(
+    i18n.language === 'vi' ? 'vi-VN' : 'en-US',
+    { year: 'numeric', month: 'long', day: 'numeric' }
+  );
+
   return (
     <div className="terms-page">
       <div className="terms-container">
-        <h1>Điều khoản sử dụng</h1>
-        <p className="last-updated">Cập nhật lần cuối: 23/12/2025</p>
+        <h1>{t('pages.terms.title')}</h1>
+        <p className="last-updated">{t('pages.terms.lastUpdated')}: {lastUpdatedDate}</p>
 
         <section className="terms-section">
           <h2>1. Giới thiệu</h2>

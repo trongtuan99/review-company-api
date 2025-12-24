@@ -1,48 +1,51 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Sitemap.css';
 
 const Sitemap = () => {
+  const { t } = useTranslation();
+
   const sitemapData = [
     {
-      title: 'Trang chính',
+      title: t('pages.sitemap.mainPages'),
       icon: '🏠',
       links: [
-        { name: 'Trang chủ', path: '/' },
-        { name: 'Danh sách công ty', path: '/companies' },
-        { name: 'So sánh công ty', path: '/compare' },
+        { name: t('pages.sitemap.home'), path: '/' },
+        { name: t('pages.sitemap.companyList'), path: '/companies' },
+        { name: t('pages.sitemap.compareCompanies'), path: '/compare' },
       ],
     },
     {
-      title: 'Tài khoản',
+      title: t('pages.sitemap.account'),
       icon: '👤',
       links: [
-        { name: 'Đăng nhập', path: '/login' },
-        { name: 'Đăng ký', path: '/register' },
-        { name: 'Hồ sơ cá nhân', path: '/profile' },
+        { name: t('pages.sitemap.login'), path: '/login' },
+        { name: t('pages.sitemap.register'), path: '/register' },
+        { name: t('pages.sitemap.profile'), path: '/profile' },
       ],
     },
     {
-      title: 'Đánh giá',
+      title: t('pages.sitemap.reviews'),
       icon: '⭐',
       links: [
-        { name: 'Viết đánh giá', path: '/write-review' },
-        { name: 'Hướng dẫn đánh giá', path: '/guidelines' },
+        { name: t('pages.sitemap.writeReview'), path: '/write-review' },
+        { name: t('pages.sitemap.reviewGuidelines'), path: '/guidelines' },
       ],
     },
     {
-      title: 'Hỗ trợ',
+      title: t('pages.sitemap.support'),
       icon: '💬',
       links: [
-        { name: 'Liên hệ', path: '/contact' },
-        { name: 'Câu hỏi thường gặp', path: '/faq' },
+        { name: t('pages.sitemap.contact'), path: '/contact' },
+        { name: t('pages.sitemap.faq'), path: '/faq' },
       ],
     },
     {
-      title: 'Pháp lý',
+      title: t('pages.sitemap.legal'),
       icon: '📋',
       links: [
-        { name: 'Điều khoản sử dụng', path: '/terms' },
-        { name: 'Chính sách bảo mật', path: '/privacy' },
+        { name: t('pages.sitemap.terms'), path: '/terms' },
+        { name: t('pages.sitemap.privacy'), path: '/privacy' },
       ],
     },
   ];
@@ -50,10 +53,8 @@ const Sitemap = () => {
   return (
     <div className="sitemap-page">
       <div className="sitemap-container">
-        <h1>Sơ đồ trang web</h1>
-        <p className="sitemap-intro">
-          Tìm nhanh các trang và tính năng trên ReviewCompany
-        </p>
+        <h1>{t('pages.sitemap.title')}</h1>
+        <p className="sitemap-intro">{t('pages.sitemap.intro')}</p>
 
         <div className="sitemap-grid">
           {sitemapData.map((section, index) => (
@@ -74,9 +75,9 @@ const Sitemap = () => {
         </div>
 
         <div className="sitemap-footer">
-          <p>Không tìm thấy trang bạn cần?</p>
+          <p>{t('pages.sitemap.notFoundPage')}</p>
           <Link to="/contact" className="contact-link">
-            Liên hệ với chúng tôi
+            {t('pages.sitemap.contactUs')}
           </Link>
         </div>
       </div>

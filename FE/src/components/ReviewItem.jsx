@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useReviewMutations } from '../hooks/useReviewMutations';
 import ReplyList from './ReplyList';
 import CreateReplyForm from './CreateReplyForm';
 import './ReviewItem.css';
 
 const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
+  const { t, i18n } = useTranslation();
   // Local override state - only used during mutation, null otherwise
   // Key prop from parent (review.id) should reset this component when review changes
   const [likeOverride, setLikeOverride] = useState(null);
@@ -106,7 +108,7 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
   const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('vi-VN', {
+    return date.toLocaleDateString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
@@ -159,19 +161,19 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
           <div className="review-sections">
             {pros && (
               <div className="review-section pros">
-                <span className="section-label">👍 Ưu điểm</span>
+                <span className="section-label">👍 {t('review.pros')}</span>
                 <p>{pros}</p>
               </div>
             )}
             {cons && (
               <div className="review-section cons">
-                <span className="section-label">👎 Nhược điểm</span>
+                <span className="section-label">👎 {t('review.cons')}</span>
                 <p>{cons}</p>
               </div>
             )}
             {advice && (
               <div className="review-section advice">
-                <span className="section-label">💡 Lời khuyên</span>
+                <span className="section-label">💡 {t('review.advice')}</span>
                 <p>{advice}</p>
               </div>
             )}
@@ -193,9 +195,9 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
             <span className="job-title-badge">💼 {currentReview.job_title}</span>
           )}
           {currentReview.is_anonymous ? (
-            <span className="anonymous-badge">🔒 Ẩn danh</span>
+            <span className="anonymous-badge">🔒 {t('components.anonymous')}</span>
           ) : (
-            <span className="review-author">👤 {currentReview.user_name || 'Người dùng'}</span>
+            <span className="review-author">👤 {currentReview.user_name || t('components.user')}</span>
           )}
           {currentReview.created_at && (
             <span className="review-date">{formatDate(currentReview.created_at)}</span>
@@ -206,7 +208,7 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
       <div className="review-content">
         {currentReview.reviews_content
           ? formatReviewContent(currentReview.reviews_content)
-          : <p>Không có nội dung đánh giá.</p>
+          : <p>{t('components.noReviewContent')}</p>
         }
       </div>
 
@@ -233,14 +235,14 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
           className="action-btn"
           onClick={() => setShowReplies(!showReplies)}
         >
-          💬 {currentReview.total_reply || 0} trả lời
+          💬 {currentReview.total_reply || 0} {t('components.replies')}
         </button>
         {isAuthenticated && (
           <button
             className="action-btn"
             onClick={() => setShowReplyForm(!showReplyForm)}
           >
-            {showReplyForm ? 'Hủy' : 'Trả lời'}
+            {showReplyForm ? t('common.cancel') : t('components.reply')}
           </button>
         )}
       </div>

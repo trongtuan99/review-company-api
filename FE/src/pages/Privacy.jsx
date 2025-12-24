@@ -1,11 +1,18 @@
+import { useTranslation } from 'react-i18next';
 import './Privacy.css';
 
 const Privacy = () => {
+  const { t, i18n } = useTranslation();
+  const lastUpdatedDate = new Date('2025-12-23').toLocaleDateString(
+    i18n.language === 'vi' ? 'vi-VN' : 'en-US',
+    { year: 'numeric', month: 'long', day: 'numeric' }
+  );
+
   return (
     <div className="privacy-page">
       <div className="privacy-container">
-        <h1>Chính sách bảo mật</h1>
-        <p className="last-updated">Cập nhật lần cuối: 23/12/2025</p>
+        <h1>{t('pages.privacy.title')}</h1>
+        <p className="last-updated">{t('pages.privacy.lastUpdated')}: {lastUpdatedDate}</p>
 
         <section className="privacy-section">
           <h2>1. Giới thiệu</h2>

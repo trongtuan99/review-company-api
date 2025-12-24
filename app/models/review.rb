@@ -1,8 +1,16 @@
 class Review < ApplicationRecord
   include BaseConcern
 
+  enum employment_status: {
+    not_specified: 0,
+    current_employee: 1,
+    former_employee: 2
+  }
+
   validates :title, presence: true, length: { minimum: 5, maximum: 100 }
   validates :total_dislike, :total_like, :total_reply, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :salary_satisfaction, :work_life_balance, :career_growth, :management_rating, :culture_rating,
+            numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_nil: true
 
   belongs_to :user, optional: true
   belongs_to :company

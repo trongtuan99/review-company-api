@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { reviewService } from '../../services/reviewService';
 import { adminService } from '../../services/adminService';
 import ConfirmModal from '../../components/ConfirmModal';
 import './Admin.css';
 
 const AdminReviews = () => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -113,15 +115,15 @@ const AdminReviews = () => {
       setModalAction(null);
     } catch (error) {
       console.error('Error performing action:', error);
-      alert('Co loi xay ra: ' + (error.message || 'Unknown error'));
+      alert(t('admin.errorOccurred') + ': ' + (error.message || 'Unknown error'));
     }
   };
 
   const getStatusBadge = (status) => {
     const statusMap = {
-      pending: { label: 'Cho duyet', class: 'pending' },
-      approved: { label: 'Da duyet', class: 'approved' },
-      rejected: { label: 'Tu choi', class: 'rejected' },
+      pending: { label: t('admin.pending'), class: 'pending' },
+      approved: { label: t('admin.approved'), class: 'approved' },
+      rejected: { label: t('admin.rejected'), class: 'rejected' },
     };
     const statusInfo = statusMap[status] || { label: status, class: 'default' };
     return <span className={`status-badge ${statusInfo.class}`}>{statusInfo.label}</span>;
@@ -144,38 +146,38 @@ const AdminReviews = () => {
     <div className="admin-page">
       <div className="admin-header">
         <div className="admin-header-content">
-          <h1>Quan ly Reviews</h1>
-          <p>Duyet va quan ly cac danh gia cong ty</p>
+          <h1>{t('admin.manageReviews')}</h1>
+          <p>{t('admin.reviewAndManage')}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="admin-filters">
         <div className="filter-group">
-          <label>Trang thai</label>
+          <label>{t('admin.status')}</label>
           <select
             value={filter.status}
             onChange={(e) => handleStatusChange(e.target.value)}
             className="filter-select"
           >
-            <option value="all">Tat ca</option>
-            <option value="pending">Cho duyet</option>
-            <option value="approved">Da duyet</option>
-            <option value="rejected">Tu choi</option>
+            <option value="all">{t('admin.all')}</option>
+            <option value="pending">{t('admin.pending')}</option>
+            <option value="approved">{t('admin.approved')}</option>
+            <option value="rejected">{t('admin.rejected')}</option>
           </select>
         </div>
         <div className="filter-group search-group">
-          <label>Tim kiem</label>
+          <label>{t('common.search')}</label>
           <input
             type="text"
-            placeholder="Tim theo tieu de, cong ty..."
+            placeholder={t('admin.searchByTitleCompany')}
             value={searchInput}
             onChange={(e) => handleSearchChange(e.target.value)}
             className="filter-input"
           />
         </div>
         <div className="filter-group">
-          <label>Sap xep</label>
+          <label>{t('admin.sortBy')}</label>
           <select
             value={`${filter.sortBy}-${filter.sortOrder}`}
             onChange={(e) => {
@@ -184,16 +186,16 @@ const AdminReviews = () => {
             }}
             className="filter-select"
           >
-            <option value="created_at-desc">Moi nhat</option>
-            <option value="created_at-asc">Cu nhat</option>
-            <option value="score-desc">Rating cao nhat</option>
-            <option value="score-asc">Rating thap nhat</option>
-            <option value="total_like-desc">Nhieu like nhat</option>
-            <option value="total_like-asc">It like nhat</option>
+            <option value="created_at-desc">{t('admin.newest')}</option>
+            <option value="created_at-asc">{t('admin.oldest')}</option>
+            <option value="score-desc">{t('admin.highestRating')}</option>
+            <option value="score-asc">{t('admin.lowestRating')}</option>
+            <option value="total_like-desc">{t('admin.mostLiked')}</option>
+            <option value="total_like-asc">{t('admin.leastLiked')}</option>
           </select>
         </div>
         <button className="btn-refresh" onClick={loadReviews}>
-          Lam moi
+          {t('admin.refresh')}
         </button>
       </div>
 
@@ -202,43 +204,43 @@ const AdminReviews = () => {
         {loading ? (
           <div className="admin-loading-state">
             <div className="loading-spinner"></div>
-            <p>Dang tai...</p>
+            <p>{t('common.loading')}</p>
           </div>
         ) : reviews.length === 0 ? (
           <div className="empty-state">
             <span>📭</span>
-            <p>Khong co reviews nao</p>
+            <p>{t('admin.noReviews')}</p>
           </div>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Tieu de</th>
-                <th>Cong ty</th>
+                <th>{t('review.title')}</th>
+                <th>{t('admin.company')}</th>
                 <th
                   className="sortable"
                   onClick={() => handleSortChange('score')}
                   style={{ cursor: 'pointer' }}
                 >
-                  Rating{getSortIcon('score')}
+                  {t('admin.rating')}{getSortIcon('score')}
                 </th>
-                <th>Trang thai</th>
+                <th>{t('admin.status')}</th>
                 <th
                   className="sortable"
                   onClick={() => handleSortChange('total_like')}
                   style={{ cursor: 'pointer' }}
                 >
-                  Likes{getSortIcon('total_like')}
+                  {t('admin.likes')}{getSortIcon('total_like')}
                 </th>
                 <th
                   className="sortable"
                   onClick={() => handleSortChange('created_at')}
                   style={{ cursor: 'pointer' }}
                 >
-                  Ngay tao{getSortIcon('created_at')}
+                  {t('admin.createdAt')}{getSortIcon('created_at')}
                 </th>
-                <th>Thao tac</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -248,7 +250,7 @@ const AdminReviews = () => {
                   <td>
                     <div className="review-title-cell">
                       <Link to={`/reviews/${review.id}`} className="title">
-                        {review.title || 'Khong co tieu de'}
+                        {review.title || t('admin.noTitle')}
                       </Link>
                       <span className="preview">
                         {(review.reviews_content || review.content)?.substring(0, 50)}...
@@ -273,14 +275,14 @@ const AdminReviews = () => {
                       <Link
                         to={`/reviews/${review.id}`}
                         className="action-btn view"
-                        title="Xem chi tiet"
+                        title={t('admin.viewDetail')}
                       >
                         👁️
                       </Link>
                       <button
                         className="action-btn delete"
                         onClick={() => handleAction(review, 'delete')}
-                        title="Xoa"
+                        title={t('common.delete')}
                       >
                         🗑️
                       </button>
@@ -300,7 +302,7 @@ const AdminReviews = () => {
             disabled={filter.page === 1}
             onClick={() => handlePageChange(filter.page - 1)}
           >
-            ← Truoc
+            ← {t('common.previous')}
           </button>
           <div className="pagination-pages">
             {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
@@ -329,10 +331,10 @@ const AdminReviews = () => {
             disabled={filter.page === pagination.pages}
             onClick={() => handlePageChange(filter.page + 1)}
           >
-            Sau →
+            {t('common.next')} →
           </button>
           <span className="pagination-info">
-            Trang {filter.page} / {pagination.pages} ({pagination.total} ket qua)
+            {t('admin.page')} {filter.page} / {pagination.pages} ({pagination.total} {t('common.results')})
           </span>
         </div>
       )}
@@ -341,10 +343,10 @@ const AdminReviews = () => {
       {showModal && modalAction === 'delete' && (
         <ConfirmModal
           isOpen={showModal}
-          title="Xoa Review"
-          message={`Ban co chac muon xoa review "${selectedReview?.title || 'nay'}"?`}
-          confirmText="Xoa"
-          cancelText="Huy"
+          title={t('admin.deleteReview')}
+          message={`${t('admin.confirmDeleteReview')} "${selectedReview?.title || 'this'}"?`}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
           onConfirm={confirmAction}
           onCancel={() => setShowModal(false)}
           type="danger"
@@ -355,19 +357,19 @@ const AdminReviews = () => {
       {showModal && modalAction === 'view' && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div className="modal-content view-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{selectedReview?.title || 'Chi tiet Review'}</h2>
+            <h2>{selectedReview?.title || t('admin.viewDetail')}</h2>
             <div className="review-detail">
-              <p><strong>Cong ty:</strong> {selectedReview?.company?.name}</p>
-              <p><strong>Rating:</strong> ⭐ {selectedReview?.score || selectedReview?.overall_rating}</p>
-              <p><strong>Trang thai:</strong> {getStatusBadge(selectedReview?.status)}</p>
-              <p><strong>Noi dung:</strong></p>
+              <p><strong>{t('admin.company')}:</strong> {selectedReview?.company?.name}</p>
+              <p><strong>{t('admin.rating')}:</strong> ⭐ {selectedReview?.score || selectedReview?.overall_rating}</p>
+              <p><strong>{t('admin.status')}:</strong> {getStatusBadge(selectedReview?.status)}</p>
+              <p><strong>{t('review.content')}:</strong></p>
               <div className="review-content">
                 {selectedReview?.reviews_content || selectedReview?.content}
               </div>
             </div>
             <div className="modal-actions">
               <button className="btn-primary" onClick={() => setShowModal(false)}>
-                Dong
+                {t('common.close')}
               </button>
             </div>
           </div>

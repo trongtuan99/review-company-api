@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Navbar.css';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
@@ -20,20 +23,21 @@ const Navbar = () => {
     <nav className="navbar">
       <div className="navbar-container">
         <Link to="/" className="navbar-brand">
-          Review Company
+          {t('nav.brand')}
         </Link>
-        
+
         {/* Desktop Menu */}
         <div className="navbar-menu desktop-menu">
           <Link to="/companies" className="navbar-link">
-            Tất cả công ty
+            {t('nav.allCompanies')}
           </Link>
           <Link to="/about" className="navbar-link">
-            Về chúng tôi
+            {t('nav.about')}
           </Link>
           <Link to="/faq" className="navbar-link">
-            FAQ
+            {t('nav.faq')}
           </Link>
+          <LanguageSwitcher />
           <ThemeToggle />
           {isAuthenticated ? (
             <div className="user-menu-wrapper">
@@ -56,7 +60,7 @@ const Navbar = () => {
                     className="user-menu-item"
                     onClick={() => setShowUserMenu(false)}
                   >
-                    👤 Hồ sơ của tôi
+                    👤 {t('nav.profile')}
                   </Link>
                   {isAdmin && (
                     <Link
@@ -64,14 +68,14 @@ const Navbar = () => {
                       className="user-menu-item admin-link"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      ⚙️ Quản trị Admin
+                      ⚙️ {t('nav.admin')}
                     </Link>
                   )}
                   <button
                     className="user-menu-item"
                     onClick={handleLogout}
                   >
-                    🚪 Đăng xuất
+                    🚪 {t('nav.logout')}
                   </button>
                 </div>
               )}
@@ -79,10 +83,10 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/login" className="navbar-link">
-                Đăng nhập
+                {t('nav.login')}
               </Link>
               <Link to="/register" className="navbar-link btn-primary">
-                Đăng ký
+                {t('nav.register')}
               </Link>
             </>
           )}
@@ -106,25 +110,28 @@ const Navbar = () => {
             className="mobile-menu-item"
             onClick={() => setShowMenu(false)}
           >
-            Tất cả công ty
+            {t('nav.allCompanies')}
           </Link>
           <Link
             to="/about"
             className="mobile-menu-item"
             onClick={() => setShowMenu(false)}
           >
-            Về chúng tôi
+            {t('nav.about')}
           </Link>
           <Link
             to="/faq"
             className="mobile-menu-item"
             onClick={() => setShowMenu(false)}
           >
-            FAQ
+            {t('nav.faq')}
           </Link>
           <div className="mobile-theme-toggle">
-            <span>Chế độ hiển thị</span>
+            <span>{t('nav.displayMode')}</span>
             <ThemeToggle />
+          </div>
+          <div className="mobile-language-toggle">
+            <LanguageSwitcher />
           </div>
           {isAuthenticated ? (
             <>
@@ -133,7 +140,7 @@ const Navbar = () => {
                 className="mobile-menu-item"
                 onClick={() => setShowMenu(false)}
               >
-                Hồ sơ của tôi
+                {t('nav.profile')}
               </Link>
               {isAdmin && (
                 <Link
@@ -141,14 +148,14 @@ const Navbar = () => {
                   className="mobile-menu-item admin-link"
                   onClick={() => setShowMenu(false)}
                 >
-                  ⚙️ Quản trị Admin
+                  ⚙️ {t('nav.admin')}
                 </Link>
               )}
               <button
                 className="mobile-menu-item"
                 onClick={handleLogout}
               >
-                Đăng xuất
+                {t('nav.logout')}
               </button>
             </>
           ) : (
@@ -158,14 +165,14 @@ const Navbar = () => {
                 className="mobile-menu-item"
                 onClick={() => setShowMenu(false)}
               >
-                Đăng nhập
+                {t('nav.login')}
               </Link>
               <Link
                 to="/register"
                 className="mobile-menu-item btn-primary"
                 onClick={() => setShowMenu(false)}
               >
-                Đăng ký
+                {t('nav.register')}
               </Link>
             </>
           )}
@@ -176,4 +183,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './Register.css';
 
 const Register = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const prefilledEmail = searchParams.get('email') || '';
   const isFromNewsletter = !!prefilledEmail;
@@ -39,19 +41,19 @@ const Register = () => {
     setError('');
 
     if (formData.password !== formData.password_confirmation) {
-      setError('Mật khẩu không khớp');
+      setError(t('auth.passwordMismatch'));
       return;
     }
 
     setLoading(true);
     const result = await register(formData);
-    
+
     if (result.success) {
       navigate('/');
     } else {
-      setError(result.error || 'Đăng ký thất bại');
+      setError(result.error || t('auth.registerFailed'));
     }
-    
+
     setLoading(false);
   };
 
@@ -65,40 +67,40 @@ const Register = () => {
               <span className="step-line"></span>
               <span className="step active">2</span>
             </div>
-            <h2>Hoàn tất đăng ký</h2>
-            <p className="register-subtitle">Tạo mật khẩu để hoàn tất đăng ký tài khoản</p>
+            <h2>{t('auth.completeRegistration')}</h2>
+            <p className="register-subtitle">{t('auth.createPasswordSubtitle')}</p>
           </div>
         ) : (
-          <h2>Đăng ký</h2>
+          <h2>{t('auth.register')}</h2>
         )}
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-row">
             <div className="form-group">
-              <label>Họ</label>
+              <label>{t('auth.lastName')}</label>
               <input
                 type="text"
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
                 required
-                placeholder="Nguyễn"
+                placeholder="Nguyen"
               />
             </div>
             <div className="form-group">
-              <label>Tên</label>
+              <label>{t('auth.firstName')}</label>
               <input
                 type="text"
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
                 required
-                placeholder="Văn A"
+                placeholder="Van A"
               />
             </div>
           </div>
           <div className={`form-group ${isFromNewsletter ? 'email-prefilled' : ''}`}>
-            <label>Email {isFromNewsletter && <span className="verified-badge">✓ Đã nhập</span>}</label>
+            <label>{t('auth.email')} {isFromNewsletter && <span className="verified-badge">✓ {t('auth.emailEntered')}</span>}</label>
             <input
               type="email"
               name="email"
@@ -111,7 +113,7 @@ const Register = () => {
             />
           </div>
           <div className="form-group">
-            <label>Số điện thoại</label>
+            <label>{t('auth.phone')}</label>
             <input
               type="tel"
               name="phone_number"
@@ -121,7 +123,7 @@ const Register = () => {
             />
           </div>
           <div className="form-group">
-            <label>Mật khẩu</label>
+            <label>{t('auth.password')}</label>
             <input
               type="password"
               name="password"
@@ -132,7 +134,7 @@ const Register = () => {
             />
           </div>
           <div className="form-group">
-            <label>Xác nhận mật khẩu</label>
+            <label>{t('auth.confirmPassword')}</label>
             <input
               type="password"
               name="password_confirmation"
@@ -143,11 +145,11 @@ const Register = () => {
             />
           </div>
           <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Đang đăng ký...' : 'Đăng ký'}
+            {loading ? t('auth.registering') : t('auth.registerButton')}
           </button>
         </form>
         <p className="login-link">
-          Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+          {t('auth.hasAccount')} <Link to="/login">{t('auth.loginNow')}</Link>
         </p>
       </div>
     </div>
@@ -155,4 +157,3 @@ const Register = () => {
 };
 
 export default Register;
-

@@ -43,4 +43,21 @@ en:
       destroyed: "destroy done"
       ok: "Oke"
 
+  admin_activity:
+    actions:
+      create: "created"
+      update: "updated"
+      delete: "deleted"
+      restore: "restored"
+      update_status: "changed status of"
+      update_role: "changed role of"
+      update_permissions: "updated permissions for"
+      login: "logged in"
+      logout: "logged out"
+    resources:
+      user: "User"
+      company: "Company"
+      review: "Review"
+      role: "Role"
+
 

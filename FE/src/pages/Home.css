@@ -185,12 +185,12 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  background: white;
+  background: var(--glassdoor-white);
   backdrop-filter: blur(20px);
   border: 2px solid var(--glassdoor-border);
   border-radius: 16px;
   padding: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px var(--glassdoor-shadow);
 }
 
 .search-input-wrapper {
@@ -1318,6 +1318,149 @@
 
   .no-results-message p {
     font-size: 16px;
+  }
+}
+
+/* Modal Styles */
+.home-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40px;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.home-container .modal-content {
+  background: var(--glassdoor-white);
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: modalSlideUp 0.3s ease;
+}
+
+.home-container .modal-content.modal-large {
+  max-width: 800px;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-container .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 50%;
+  font-size: 24px;
+  color: var(--glassdoor-gray-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.home-container .modal-close:hover {
+  background: var(--glassdoor-border);
+  color: var(--glassdoor-gray);
+}
+
+/* Adjust form inside modal */
+.home-container .modal-content .create-company-form {
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 16px;
+}
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .home-container .modal-overlay {
+    padding: 24px;
+  }
+
+  .home-container .modal-content {
+    max-width: 90%;
+    max-height: 88vh;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  .home-container .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .home-container .modal-content {
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    animation: modalSlideUpMobile 0.3s ease;
+  }
+
+  .home-container .modal-content .create-company-form {
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .home-container .modal-close {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  @keyframes modalSlideUpMobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Small mobile (< 480px) */
+@media (max-width: 480px) {
+  .home-container .modal-content {
+    max-height: 95vh;
+  }
+
+  .home-container .modal-content .create-company-form {
+    padding: 16px;
   }
 }
 

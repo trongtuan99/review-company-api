@@ -1,11 +1,18 @@
 class Api::V1::UserController < ApplicationController
-  around_action :with_transaction, except: %i[update_profile delete_user activity_stats recent_comments my_reviews all stats create update_role]
-  before_action :get_user, only: [:update_profile, :delete_user, :index, :update_role]
-  before_action :authenticate_user!, only: [:activity_stats, :recent_comments, :my_reviews, :all, :stats, :delete_user, :create, :update_role, :update_profile]
+  include AdminTrackable
+
+  around_action :with_transaction, except: %i[update_profile delete_user activity_stats recent_comments my_reviews all stats create update_role show]
+  before_action :get_user, only: [:update_profile, :delete_user, :show, :update_role]
+  before_action :authenticate_user!, only: [:index, :activity_stats, :recent_comments, :my_reviews, :all, :stats, :delete_user, :create, :update_role, :update_profile, :show]
   before_action :validate_permission, only: [:update_profile, :delete_user]
   before_action :check_admin_role, only: [:all, :stats, :create, :update_role]
 
   def index
+    # For logged-in user to get their own profile
+    render json: json_with_success(data: current_user, default_serializer: UserSerializer)
+  end
+
+  def show
     render json: json_with_success(data: @user, default_serializer: UserSerializer)
   end
 
@@ -45,6 +52,7 @@ class Api::V1::UserController < ApplicationController
     user = User.new(create_user_params)
     user.role_id = params[:role_id] if params[:role_id].present?
     user.save!
+    track_admin_action('create', user)
     render json: json_with_success(data: user, default_serializer: UserSerializer)
   rescue ActiveRecord::RecordInvalid => e
     render json: json_with_error(message: e.message)
@@ -55,7 +63,9 @@ class Api::V1::UserController < ApplicationController
     role = Role.find_by(id: params[:role_id])
     return render json: json_with_error(message: "Role not found") unless role
 
+    old_role = @user.role&.name || @user.role&.role
     @user.update!(role_id: role.id)
+    track_admin_action('update_role', @user, { old_role: old_role, new_role: role.name || role.role })
     render json: json_with_success(data: @user, default_serializer: UserSerializer)
   end
 
@@ -66,6 +76,7 @@ class Api::V1::UserController < ApplicationController
 
   def delete_user
     @user.update_attribute(:is_deleted, true)
+    track_admin_action('delete', @user)
     render json: json_with_empty_success
   end
 

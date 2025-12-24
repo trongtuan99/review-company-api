@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { adminService } from '../../services/adminService';
 import ConfirmModal from '../../components/ConfirmModal';
 import './Admin.css';
 
 const AdminUsers = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -89,14 +91,14 @@ const AdminUsers = () => {
       setModalAction(null);
     } catch (error) {
       console.error('Error performing action:', error);
-      alert('Có lỗi xảy ra: ' + (error.message || 'Unknown error'));
+      alert(t('admin.errorOccurred') + ': ' + (error.message || 'Unknown error'));
     }
   };
 
   const handleCreateUser = async (e) => {
     e.preventDefault();
     if (!createForm.email || !createForm.password) {
-      alert('Email và Password là bắt buộc');
+      alert(t('admin.emailPasswordRequired'));
       return;
     }
 
@@ -118,7 +120,7 @@ const AdminUsers = () => {
       }
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Lỗi tạo user: ' + (error.message || 'Unknown error'));
+      alert(t('admin.createUserError') + ': ' + (error.message || 'Unknown error'));
     } finally {
       setCreateLoading(false);
     }
@@ -126,7 +128,7 @@ const AdminUsers = () => {
 
   const handleUpdateRole = async () => {
     if (!selectedUser || !selectedRoleId) {
-      alert('Vui lòng chọn role');
+      alert(t('admin.pleaseSelectRole'));
       return;
     }
 
@@ -138,7 +140,7 @@ const AdminUsers = () => {
       await loadUsers();
     } catch (error) {
       console.error('Error updating role:', error);
-      alert('Lỗi cập nhật role: ' + (error.message || 'Unknown error'));
+      alert(t('admin.updateRoleError') + ': ' + (error.message || 'Unknown error'));
     }
   };
 
@@ -165,12 +167,12 @@ const AdminUsers = () => {
     <div className="admin-page">
       <div className="admin-header">
         <div className="admin-header-content">
-          <h1>Quản lý Users</h1>
-          <p>Quản lý người dùng và phân quyền</p>
+          <h1>{t('admin.manageUsers')}</h1>
+          <p>{t('admin.userAndPermission')}</p>
         </div>
         <div className="admin-header-actions">
           <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
-            + Thêm User
+            + {t('admin.addUser')}
           </button>
         </div>
       </div>
@@ -178,17 +180,17 @@ const AdminUsers = () => {
       {/* Filters */}
       <div className="admin-filters">
         <div className="filter-group search-group">
-          <label>Tìm kiếm</label>
+          <label>{t('common.search')}</label>
           <input
             type="text"
-            placeholder="Tìm theo email, tên..."
+            placeholder={t('admin.searchByEmailName')}
             value={filter.search}
             onChange={(e) => handleFilterChange('search', e.target.value)}
             className="filter-input"
           />
         </div>
         <button className="btn-refresh" onClick={loadUsers}>
-          🔄 Làm mới
+          🔄 {t('admin.refresh')}
         </button>
       </div>
 
@@ -197,23 +199,23 @@ const AdminUsers = () => {
         {loading ? (
           <div className="admin-loading-state">
             <div className="loading-spinner"></div>
-            <p>Đang tải...</p>
+            <p>{t('common.loading')}</p>
           </div>
         ) : users.length === 0 ? (
           <div className="empty-state">
             <span>👥</span>
-            <p>Không có users nào</p>
+            <p>{t('admin.noUsers')}</p>
           </div>
         ) : (
           <table className="admin-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>User</th>
-                <th>Email</th>
-                <th>Vai trò</th>
-                <th>Ngày tạo</th>
-                <th>Thao tác</th>
+                <th>{t('admin.user')}</th>
+                <th>{t('admin.email')}</th>
+                <th>{t('admin.role')}</th>
+                <th>{t('admin.createdAt')}</th>
+                <th>{t('admin.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -236,14 +238,14 @@ const AdminUsers = () => {
                       <button
                         className="action-btn edit"
                         onClick={() => handleAction(user, 'update-role')}
-                        title="Đổi vai trò"
+                        title={t('admin.changeRole')}
                       >
                         🔑
                       </button>
                       <button
                         className="action-btn delete"
                         onClick={() => handleAction(user, 'delete')}
-                        title="Xóa"
+                        title={t('common.delete')}
                       >
                         🗑️
                       </button>
@@ -263,14 +265,14 @@ const AdminUsers = () => {
             disabled={filter.page === 1}
             onClick={() => handleFilterChange('page', filter.page - 1)}
           >
-            ← Trước
+            ← {t('common.previous')}
           </button>
-          <span>Trang {filter.page} / {pagination.pages}</span>
+          <span>{t('admin.page')} {filter.page} / {pagination.pages}</span>
           <button
             disabled={filter.page === pagination.pages}
             onClick={() => handleFilterChange('page', filter.page + 1)}
           >
-            Sau →
+            {t('common.next')} →
           </button>
         </div>
       )}
@@ -279,10 +281,10 @@ const AdminUsers = () => {
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Thêm User mới</h2>
+            <h2>{t('admin.addNewUser')}</h2>
             <form onSubmit={handleCreateUser}>
               <div className="form-group">
-                <label>Email *</label>
+                <label>{t('admin.email')} *</label>
                 <input
                   type="email"
                   value={createForm.email}
@@ -291,7 +293,7 @@ const AdminUsers = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Password *</label>
+                <label>{t('auth.password')} *</label>
                 <input
                   type="password"
                   value={createForm.password}
@@ -301,7 +303,7 @@ const AdminUsers = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Họ</label>
+                <label>{t('auth.lastName')}</label>
                 <input
                   type="text"
                   value={createForm.first_name}
@@ -309,7 +311,7 @@ const AdminUsers = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Tên</label>
+                <label>{t('auth.firstName')}</label>
                 <input
                   type="text"
                   value={createForm.last_name}
@@ -317,13 +319,13 @@ const AdminUsers = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Vai trò</label>
+                <label>{t('admin.role')}</label>
                 <select
                   value={createForm.role_id}
                   onChange={(e) => setCreateForm({ ...createForm, role_id: e.target.value })}
                   className="filter-select"
                 >
-                  <option value="">-- Mặc định (User) --</option>
+                  <option value="">{t('admin.defaultUser')}</option>
                   {roles.map((role) => (
                     <option key={role.id} value={role.id}>
                       {role.role}
@@ -333,10 +335,10 @@ const AdminUsers = () => {
               </div>
               <div className="modal-actions">
                 <button type="button" className="btn-cancel" onClick={() => setShowCreateModal(false)}>
-                  Hủy
+                  {t('common.cancel')}
                 </button>
                 <button type="submit" className="btn-primary" disabled={createLoading}>
-                  {createLoading ? 'Đang tạo...' : 'Tạo User'}
+                  {createLoading ? t('admin.creating') : t('admin.createUser')}
                 </button>
               </div>
             </form>
@@ -348,16 +350,16 @@ const AdminUsers = () => {
       {showRoleModal && (
         <div className="modal-overlay" onClick={() => setShowRoleModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Cập nhật vai trò</h2>
-            <p>User: {selectedUser?.email}</p>
+            <h2>{t('admin.updateRole')}</h2>
+            <p>{t('admin.user')}: {selectedUser?.email}</p>
             <div className="form-group">
-              <label>Vai trò</label>
+              <label>{t('admin.role')}</label>
               <select
                 value={selectedRoleId}
                 onChange={(e) => setSelectedRoleId(e.target.value)}
                 className="filter-select"
               >
-                <option value="">-- Chọn vai trò --</option>
+                <option value="">{t('admin.selectRole')}</option>
                 {roles.map((role) => (
                   <option key={role.id} value={role.id}>
                     {role.role}
@@ -367,10 +369,10 @@ const AdminUsers = () => {
             </div>
             <div className="modal-actions">
               <button className="btn-cancel" onClick={() => setShowRoleModal(false)}>
-                Hủy
+                {t('common.cancel')}
               </button>
               <button className="btn-primary" onClick={handleUpdateRole}>
-                Cập nhật
+                {t('admin.updateRole')}
               </button>
             </div>
           </div>
@@ -381,10 +383,10 @@ const AdminUsers = () => {
       {showModal && (
         <ConfirmModal
           isOpen={showModal}
-          title={modalAction === 'delete' ? 'Xóa User' : 'Chi tiết User'}
-          message={`Bạn có chắc muốn xóa user ${selectedUser?.email}?`}
-          confirmText="Xác nhận"
-          cancelText="Hủy"
+          title={modalAction === 'delete' ? t('admin.deleteUser') : t('admin.viewDetail')}
+          message={`${t('admin.confirmDeleteUser')} ${selectedUser?.email}?`}
+          confirmText={t('common.confirm')}
+          cancelText={t('common.cancel')}
           onConfirm={confirmAction}
           onCancel={() => setShowModal(false)}
           type="danger"

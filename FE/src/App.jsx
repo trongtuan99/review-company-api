@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
+import { ConfigProvider } from './contexts/ConfigContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import MainLayout from './components/MainLayout';
@@ -20,7 +21,7 @@ import Contact from './pages/Contact';
 import Sitemap from './pages/Sitemap';
 import WriteReview from './pages/WriteReview';
 import ReviewDetail from './pages/ReviewDetail';
-import { AdminDashboard, AdminReviews, AdminUsers, AdminCompanies, AdminRoles } from './pages/admin';
+import { AdminDashboard, AdminReviews, AdminUsers, AdminCompanies, AdminRoles, AdminConfigs, AdminContactMessages } from './pages/admin';
 import { API_BASE_URL } from './config/api';
 import './App.css';
 
@@ -40,6 +41,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <ConfigProvider>
         <Router>
         <div className="app">
           <Routes>
@@ -94,6 +96,26 @@ function App() {
                 </AdminRoute>
               }
             />
+            <Route
+              path="/admin/configs"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminConfigs />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/admin/contact-messages"
+              element={
+                <AdminRoute>
+                  <AdminLayout>
+                    <AdminContactMessages />
+                  </AdminLayout>
+                </AdminRoute>
+              }
+            />
 
             {/* Public Routes */}
             <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
@@ -134,6 +156,7 @@ function App() {
           )}
         </div>
       </Router>
+        </ConfigProvider>
     </AuthProvider>
     </QueryClientProvider>
   );

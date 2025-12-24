@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { reviewService } from '../services/reviewService';
 import ReviewItem from './ReviewItem';
 import './ReviewList.css';
 
 const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, onUpdate, companyId, filters = {} }) => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const [reviews, setReviews] = useState(initialReviews || []);
   const [page, setPage] = useState(1);
@@ -75,21 +77,21 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
       setLoading(true);
       const nextPage = page + 1;
       const response = await reviewService.getReviews(companyId, nextPage, 10, filters);
-      
+
       if (response.status === 'ok' || response.status === 'success') {
         const newReviews = response.data || [];
-        
+
         if (newReviews.length === 0) {
           setHasMore(false);
         } else {
           const existingIds = new Set(reviews.map(r => r.id));
           const uniqueNewReviews = newReviews.filter(r => !existingIds.has(r.id));
-          
+
           if (uniqueNewReviews.length > 0) {
             setReviews(prev => [...prev, ...uniqueNewReviews]);
             setPage(nextPage);
           }
-          
+
           if (response.pagination) {
             setPagination(response.pagination);
             if (nextPage >= response.pagination.total_pages) {
@@ -118,7 +120,7 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
   if (!reviews || reviews.length === 0) {
     return (
       <div className="empty-reviews">
-        <p>Chưa có đánh giá nào. Hãy là người đầu tiên đánh giá!</p>
+        <p>{t('components.noReviewsYet')}</p>
       </div>
     );
   }
@@ -127,7 +129,7 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
   if (filteredAndSortedReviews.length === 0) {
     return (
       <div className="empty-reviews">
-        <p>Không có đánh giá nào phù hợp với bộ lọc.</p>
+        <p>{t('components.noFilterResults')}</p>
       </div>
     );
   }
@@ -143,7 +145,7 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
           companyId={companyId}
         />
       ))}
-      
+
       {hasMore && (
         <div className="load-more-container">
           <button
@@ -151,7 +153,7 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
             onClick={loadMoreReviews}
             disabled={loading}
           >
-            {loading ? 'Đang tải...' : 'Xem thêm đánh giá'}
+            {loading ? t('common.loading') : t('components.loadMore')}
           </button>
         </div>
       )}
@@ -160,4 +162,3 @@ const ReviewList = ({ reviews: initialReviews, pagination: initialPagination, on
 };
 
 export default ReviewList;
-

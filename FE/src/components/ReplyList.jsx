@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { replyService } from '../services/replyService';
 import ReplyItem from './ReplyItem';
 import './ReplyList.css';
 
 const ReplyList = ({ reviewId, refreshKey }) => {
+  const { t } = useTranslation();
   const [replies, setReplies] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -32,9 +34,9 @@ const ReplyList = ({ reviewId, refreshKey }) => {
   return (
     <div className="reply-list-container">
       {loading ? (
-        <div className="loading-replies">Đang tải...</div>
+        <div className="loading-replies">{t('common.loading')}</div>
       ) : !replies || replies.length === 0 ? (
-        <div className="empty-replies">Chưa có trả lời nào</div>
+        <div className="empty-replies">{t('components.noReplies')}</div>
       ) : (
         <div className="reply-list">
           {replies.map((reply) => (
@@ -47,4 +49,3 @@ const ReplyList = ({ reviewId, refreshKey }) => {
 };
 
 export default ReplyList;
-

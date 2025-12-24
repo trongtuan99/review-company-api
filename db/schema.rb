@@ -10,10 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
+ActiveRecord::Schema[7.0].define(version: 2025_12_24_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
+
+  create_table "admin_activities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.string "action", null: false
+    t.string "resource_type", null: false
+    t.uuid "resource_id"
+    t.string "resource_name"
+    t.jsonb "details", default: {}
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_admin_activities_on_action"
+    t.index ["created_at"], name: "index_admin_activities_on_created_at"
+    t.index ["resource_type"], name: "index_admin_activities_on_resource_type"
+    t.index ["user_id"], name: "index_admin_activities_on_user_id"
+  end
 
   create_table "areas", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", limit: 255, null: false
@@ -44,6 +61,11 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
     t.integer "employee_count_min", default: 0
     t.integer "employee_count_max", default: 0
     t.boolean "is_hiring", default: false
+    t.text "description"
+    t.integer "founded_year"
+    t.string "tech_stack", limit: 500
+    t.jsonb "benefits", default: []
+    t.jsonb "social_links", default: {}
   end
 
   create_table "favorites", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -94,6 +116,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
     t.integer "total_dislike", default: 0
     t.integer "total_reply", default: 0
     t.string "job_title"
+    t.text "pros"
+    t.text "cons"
+    t.integer "salary_satisfaction", default: 0
+    t.integer "work_life_balance", default: 0
+    t.integer "career_growth", default: 0
+    t.integer "management_rating", default: 0
+    t.integer "culture_rating", default: 0
+    t.integer "employment_status", default: 0
+    t.decimal "years_employed", precision: 3, scale: 1, default: "0.0"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -105,6 +136,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
     t.boolean "allow_update", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name", limit: 50
+    t.string "description", limit: 255
+    t.jsonb "permissions", default: {}
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -114,6 +148,22 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
     t.datetime "updated_at", null: false
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
+  end
+
+  create_table "site_configs", force: :cascade do |t|
+    t.string "key", null: false
+    t.text "value"
+    t.string "value_type", default: "string"
+    t.string "category", default: "general"
+    t.string "label"
+    t.text "description"
+    t.boolean "is_public", default: false
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_site_configs_on_category"
+    t.index ["is_public"], name: "index_site_configs_on_is_public"
+    t.index ["key"], name: "index_site_configs_on_key", unique: true
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -135,6 +185,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_20_041854) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "admin_activities", "users"
   add_foreign_key "favorites", "companies"
   add_foreign_key "likes", "reviews"
   add_foreign_key "replies", "reviews"

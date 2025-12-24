@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useReplyMutations } from '../hooks/useReplyMutations';
 import './CreateReplyForm.css';
 
 const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
+  const { t } = useTranslation();
   const [content, setContent] = useState('');
   const [error, setError] = useState('');
   const { createReply, isCreating } = useReplyMutations(reviewId);
@@ -12,7 +14,7 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
     setError('');
 
     if (!content.trim()) {
-      setError('Vui lòng nhập nội dung trả lời');
+      setError(t('components.enterReplyContent'));
       return;
     }
 
@@ -21,7 +23,7 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
       onSuccess?.();
       setContent('');
     } catch (err) {
-      setError(err.message || err.error || 'Không thể tạo trả lời');
+      setError(err.message || err.error || t('components.cannotCreateReply'));
     }
   };
 
@@ -32,18 +34,18 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder="Viết trả lời..."
+          placeholder={t('components.writeReply')}
           rows={3}
           required
         />
         <div className="form-actions">
           {onCancel && (
             <button type="button" onClick={onCancel} className="btn-secondary">
-              Hủy
+              {t('common.cancel')}
             </button>
           )}
           <button type="submit" disabled={isCreating} className="btn-primary">
-            {isCreating ? 'Đang gửi...' : 'Gửi trả lời'}
+            {isCreating ? t('common.sending') : t('components.sendReply')}
           </button>
         </div>
       </form>
@@ -52,4 +54,3 @@ const CreateReplyForm = ({ reviewId, onSuccess, onCancel }) => {
 };
 
 export default CreateReplyForm;
-

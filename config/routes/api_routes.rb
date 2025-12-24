@@ -15,10 +15,15 @@ module ApiRoutes
             member do
               get :company_overview
               put :delete_company
+              put :restore
+              put :update_status
+            end
+            collection do
+              get :all
             end
           end
 
-          resources :review, only: %i[index create update] do
+          resources :review, only: %i[index show create update] do
             member do
               put :delete_review
               put :like
@@ -33,7 +38,7 @@ module ApiRoutes
           resources :reply, only: %i[index create update destroy] do
           end
 
-          resources :user, only: %i[index create] do
+          resources :user, only: %i[index show create] do
             member do
               put :delete_user
               put :update_profile
@@ -48,15 +53,34 @@ module ApiRoutes
             end
           end
 
-          resources :role, only: %i[index create update] do
+          resources :role, only: %i[index show create update] do
             member do
               put :delete_role
+              put :update_status
+              put :update_permissions
+            end
+            collection do
+              get :available_permissions
             end
           end
 
           resources :favorite, only: %i[index create destroy] do
             collection do
               get 'check/:company_id', to: 'favorite#check', as: 'check'
+            end
+          end
+
+          # Public stats endpoint
+          get 'stats', to: 'stats#index'
+          get 'stats/admin', to: 'stats#admin_stats'
+          get 'stats/admin_activities', to: 'stats#admin_activities'
+
+          # Site config endpoints
+          resources :site_config, only: %i[index show create update destroy] do
+            collection do
+              get :public_configs
+              get :categories
+              put :bulk_update
             end
           end
         end

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useReviewMutationsExtended } from '../hooks/useReviewMutationsExtended';
 import StarRating from './StarRating';
 import './CreateReviewForm.css';
 
 const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
     reviews_content: '',
@@ -15,6 +17,15 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
     pros: '',
     cons: '',
     advice: '',
+    // Detailed ratings (1-5)
+    salary_satisfaction: 0,
+    work_life_balance: 0,
+    career_growth: 0,
+    management_rating: 0,
+    culture_rating: 0,
+    // Employment info
+    employment_status: 'current_employee',
+    years_employed: '',
   });
   const [error, setError] = useState('');
   const { createReview, isCreating } = useReviewMutationsExtended(companyId);
@@ -43,11 +54,11 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
   ];
 
   const getRatingLabel = (score) => {
-    if (score <= 3) return 'Không hài lòng';
-    if (score <= 5) return 'Tạm được';
-    if (score <= 7) return 'Hài lòng';
-    if (score <= 9) return 'Rất hài lòng';
-    return 'Tuyệt vời';
+    if (score <= 3) return t('rating.unsatisfied');
+    if (score <= 5) return t('rating.acceptable');
+    if (score <= 7) return t('rating.satisfied');
+    if (score <= 9) return t('rating.verySatisfied');
+    return t('rating.excellent');
   };
 
   const handleChange = (e) => {
@@ -63,24 +74,18 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
     setError('');
 
     if (!formData.title || formData.title.length < 5) {
-      setError('Tiêu đề phải có ít nhất 5 ký tự');
+      setError(t('components.titleMinChars'));
       return;
     }
 
     if (!formData.reviews_content || formData.reviews_content.length < 20) {
-      setError('Nội dung đánh giá phải có ít nhất 20 ký tự');
+      setError(t('components.contentMinChars'));
       return;
     }
 
     try {
-      // Combine pros, cons, advice into reviews_content using special delimiters
+      // Combine advice into reviews_content if provided
       let fullContent = formData.reviews_content;
-      if (formData.pros) {
-        fullContent += `\n\n[PROS]\n${formData.pros}`;
-      }
-      if (formData.cons) {
-        fullContent += `\n\n[CONS]\n${formData.cons}`;
-      }
       if (formData.advice) {
         fullContent += `\n\n[ADVICE]\n${formData.advice}`;
       }
@@ -91,6 +96,15 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
         score: formData.score,
         job_title: formData.job_title === 'Other' ? formData.custom_job_title : formData.job_title,
         is_anonymous: formData.is_anonymous,
+        pros: formData.pros,
+        cons: formData.cons,
+        salary_satisfaction: formData.salary_satisfaction || null,
+        work_life_balance: formData.work_life_balance || null,
+        career_growth: formData.career_growth || null,
+        management_rating: formData.management_rating || null,
+        culture_rating: formData.culture_rating || null,
+        employment_status: formData.employment_status,
+        years_employed: formData.years_employed ? parseFloat(formData.years_employed) : null,
       };
 
       await createReview({ companyId, reviewData: submitData });
@@ -105,18 +119,25 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
         pros: '',
         cons: '',
         advice: '',
+        salary_satisfaction: 0,
+        work_life_balance: 0,
+        career_growth: 0,
+        management_rating: 0,
+        culture_rating: 0,
+        employment_status: 'current_employee',
+        years_employed: '',
       });
     } catch (err) {
-      setError(err.message || err.error || 'Không thể tạo đánh giá');
+      setError(err.message || err.error || t('review.cannotCreateReview'));
     }
   };
 
   return (
     <div className="create-review-form">
       <div className="form-header">
-        <h3>Viết đánh giá</h3>
+        <h3>{t('components.writeReview')}</h3>
         <Link to="/guidelines" className="guidelines-link">
-          📋 Xem hướng dẫn
+          📋 {t('components.viewGuidelines')}
         </Link>
       </div>
 
@@ -125,9 +146,9 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
       <form onSubmit={handleSubmit}>
         {/* Rating Section */}
         <div className="form-section">
-          <div className="section-title">Đánh giá tổng quan</div>
+          <div className="section-title">{t('components.overallRating')}</div>
           <div className="form-group">
-            <label>Điểm đánh giá (1-10) *</label>
+            <label>{t('components.ratingScore')} *</label>
             <div className="rating-container">
               <StarRating
                 value={formData.score}
@@ -138,18 +159,144 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
           </div>
         </div>
 
+        {/* Detailed Ratings Section */}
+        <div className="form-section">
+          <div className="section-title">{t('components.detailedRatings')}</div>
+          <p className="section-hint">{t('components.detailedRatingsHint')}</p>
+          <div className="detailed-ratings-grid">
+            <div className="rating-item">
+              <label>💰 {t('components.salaryBenefits')}</label>
+              <div className="mini-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`mini-star ${formData.salary_satisfaction >= star ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, salary_satisfaction: star }))}
+                  >
+                    ★
+                  </button>
+                ))}
+                {formData.salary_satisfaction > 0 && (
+                  <button type="button" className="clear-rating" onClick={() => setFormData(prev => ({ ...prev, salary_satisfaction: 0 }))}>✕</button>
+                )}
+              </div>
+            </div>
+            <div className="rating-item">
+              <label>⚖️ {t('components.workLifeBalance')}</label>
+              <div className="mini-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`mini-star ${formData.work_life_balance >= star ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, work_life_balance: star }))}
+                  >
+                    ★
+                  </button>
+                ))}
+                {formData.work_life_balance > 0 && (
+                  <button type="button" className="clear-rating" onClick={() => setFormData(prev => ({ ...prev, work_life_balance: 0 }))}>✕</button>
+                )}
+              </div>
+            </div>
+            <div className="rating-item">
+              <label>📈 {t('components.careerGrowth')}</label>
+              <div className="mini-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`mini-star ${formData.career_growth >= star ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, career_growth: star }))}
+                  >
+                    ★
+                  </button>
+                ))}
+                {formData.career_growth > 0 && (
+                  <button type="button" className="clear-rating" onClick={() => setFormData(prev => ({ ...prev, career_growth: 0 }))}>✕</button>
+                )}
+              </div>
+            </div>
+            <div className="rating-item">
+              <label>👔 {t('components.managementRating')}</label>
+              <div className="mini-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`mini-star ${formData.management_rating >= star ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, management_rating: star }))}
+                  >
+                    ★
+                  </button>
+                ))}
+                {formData.management_rating > 0 && (
+                  <button type="button" className="clear-rating" onClick={() => setFormData(prev => ({ ...prev, management_rating: 0 }))}>✕</button>
+                )}
+              </div>
+            </div>
+            <div className="rating-item">
+              <label>🏢 {t('components.companyCulture')}</label>
+              <div className="mini-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`mini-star ${formData.culture_rating >= star ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({ ...prev, culture_rating: star }))}
+                  >
+                    ★
+                  </button>
+                ))}
+                {formData.culture_rating > 0 && (
+                  <button type="button" className="clear-rating" onClick={() => setFormData(prev => ({ ...prev, culture_rating: 0 }))}>✕</button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Job Info Section */}
         <div className="form-section">
-          <div className="section-title">Thông tin công việc</div>
+          <div className="section-title">{t('components.jobInfo')}</div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>{t('components.employmentStatus')}</label>
+              <select
+                name="employment_status"
+                value={formData.employment_status}
+                onChange={handleChange}
+                className="form-select"
+              >
+                <option value="current_employee">{t('components.currentlyWorking')}</option>
+                <option value="former_employee">{t('components.formerEmployee')}</option>
+                <option value="not_specified">{t('components.notSpecified')}</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label>{t('components.yearsWorked')}</label>
+              <input
+                type="number"
+                name="years_employed"
+                value={formData.years_employed}
+                onChange={handleChange}
+                placeholder={t('components.yearExample')}
+                min="0"
+                step="0.5"
+                className="form-input"
+              />
+            </div>
+          </div>
           <div className="form-group">
-            <label>Chức danh của bạn</label>
+            <label>{t('components.yourJobTitle')}</label>
             <select
               name="job_title"
               value={formData.job_title}
               onChange={handleChange}
               className="form-select"
             >
-              <option value="">-- Chọn chức danh --</option>
+              <option value="">{t('components.selectJobTitle')}</option>
               {commonJobTitles.map((title) => (
                 <option key={title} value={title}>{title}</option>
               ))}
@@ -160,7 +307,7 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
                 name="custom_job_title"
                 value={formData.custom_job_title}
                 onChange={handleChange}
-                placeholder="Nhập chức danh của bạn..."
+                placeholder={t('components.enterJobTitle')}
                 className="form-input mt-2"
               />
             )}
@@ -169,10 +316,10 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
 
         {/* Review Content Section */}
         <div className="form-section">
-          <div className="section-title">Nội dung đánh giá</div>
+          <div className="section-title">{t('components.reviewContent')}</div>
 
           <div className="form-group">
-            <label>Tiêu đề đánh giá *</label>
+            <label>{t('components.reviewTitle')} *</label>
             <input
               type="text"
               name="title"
@@ -181,58 +328,58 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
               required
               minLength={5}
               maxLength={100}
-              placeholder="VD: Môi trường làm việc tốt, nhiều cơ hội phát triển"
+              placeholder={t('components.reviewTitlePlaceholder')}
               className="form-input"
             />
             <span className="char-count">{formData.title.length}/100</span>
           </div>
 
           <div className="form-group">
-            <label>Trải nghiệm tổng quan *</label>
+            <label>{t('components.overallExperience')} *</label>
             <textarea
               name="reviews_content"
               value={formData.reviews_content}
               onChange={handleChange}
               rows={4}
-              placeholder="Chia sẻ trải nghiệm chung của bạn khi làm việc tại công ty..."
+              placeholder={t('components.overallExperiencePlaceholder')}
               className="form-textarea"
             />
-            <span className="char-count">{formData.reviews_content.length} ký tự (tối thiểu 20)</span>
+            <span className="char-count">{formData.reviews_content.length} {t('components.charCount')} ({t('components.minChars')} 20)</span>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label>👍 Ưu điểm</label>
+              <label>👍 {t('review.pros')}</label>
               <textarea
                 name="pros"
                 value={formData.pros}
                 onChange={handleChange}
                 rows={3}
-                placeholder="Những điểm tích cực..."
+                placeholder={t('components.prosPlaceholder')}
                 className="form-textarea"
               />
             </div>
             <div className="form-group">
-              <label>👎 Nhược điểm</label>
+              <label>👎 {t('review.cons')}</label>
               <textarea
                 name="cons"
                 value={formData.cons}
                 onChange={handleChange}
                 rows={3}
-                placeholder="Những điểm cần cải thiện..."
+                placeholder={t('components.consPlaceholder')}
                 className="form-textarea"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label>💡 Lời khuyên cho ban lãnh đạo</label>
+            <label>💡 {t('components.adviceForManagement')}</label>
             <textarea
               name="advice"
               value={formData.advice}
               onChange={handleChange}
               rows={2}
-              placeholder="Bạn có đề xuất gì cho công ty? (tùy chọn)"
+              placeholder={t('components.advicePlaceholder')}
               className="form-textarea"
             />
           </div>
@@ -240,7 +387,7 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
 
         {/* Privacy Section */}
         <div className="form-section">
-          <div className="section-title">Tùy chọn hiển thị</div>
+          <div className="section-title">{t('components.displayOptions')}</div>
           <div className="form-group">
             <label className="checkbox-label">
               <input
@@ -249,10 +396,10 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
                 checked={formData.is_anonymous}
                 onChange={handleChange}
               />
-              <span>Đánh giá ẩn danh</span>
+              <span>{t('components.anonymousReview')}</span>
             </label>
             <p className="form-hint">
-              Nếu chọn, tên của bạn sẽ không được hiển thị công khai. Chỉ hiển thị "Người dùng ẩn danh".
+              {t('components.anonymousHint')}
             </p>
           </div>
         </div>
@@ -260,10 +407,10 @@ const CreateReviewForm = ({ companyId, onSuccess, onCancel }) => {
         {/* Actions */}
         <div className="form-actions">
           <button type="button" onClick={onCancel} className="btn-secondary">
-            Hủy
+            {t('common.cancel')}
           </button>
           <button type="submit" disabled={isCreating} className="btn-primary">
-            {isCreating ? 'Đang gửi...' : 'Gửi đánh giá'}
+            {isCreating ? t('components.submitting') : t('components.submitReview')}
           </button>
         </div>
       </form>

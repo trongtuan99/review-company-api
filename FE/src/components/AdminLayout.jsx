@@ -1,8 +1,10 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './AdminLayout.css';
 
 const AdminLayout = ({ children }) => {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -12,11 +14,13 @@ const AdminLayout = ({ children }) => {
   };
 
   const menuItems = [
-    { path: '/admin', icon: '📊', label: 'Dashboard', exact: true },
-    { path: '/admin/reviews', icon: '📝', label: 'Quản lý Reviews' },
-    { path: '/admin/users', icon: '👥', label: 'Quản lý Users' },
-    { path: '/admin/companies', icon: '🏢', label: 'Quản lý Companies' },
-    { path: '/admin/roles', icon: '🔑', label: 'Quản lý Roles' },
+    { path: '/admin', icon: '📊', label: t('admin.dashboard'), exact: true },
+    { path: '/admin/reviews', icon: '📝', label: t('admin.manageReviews') },
+    { path: '/admin/users', icon: '👥', label: t('admin.manageUsers') },
+    { path: '/admin/companies', icon: '🏢', label: t('admin.manageCompanies') },
+    { path: '/admin/roles', icon: '🔑', label: t('admin.manageRoles') },
+    { path: '/admin/contact-messages', icon: '📬', label: t('admin.contactMessages.nav') },
+    { path: '/admin/configs', icon: '⚙️', label: t('admin.settings') || 'Cai dat' },
   ];
 
   return (
@@ -55,14 +59,14 @@ const AdminLayout = ({ children }) => {
               <span className="admin-user-name">
                 {user?.first_name || 'Admin'}
               </span>
-              <span className="admin-user-role">Administrator</span>
+              <span className="admin-user-role">{t('admin.administrator')}</span>
             </div>
           </div>
           <button className="admin-logout-btn" onClick={handleLogout}>
-            <span>🚪</span> Đăng xuất
+            <span>🚪</span> {t('nav.logout')}
           </button>
           <NavLink to="/" className="back-to-site-btn">
-            <span>🌐</span> Về trang chính
+            <span>🌐</span> {t('admin.backToSite')}
           </NavLink>
         </div>
       </aside>

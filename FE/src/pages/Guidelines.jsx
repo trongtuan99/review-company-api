@@ -1,27 +1,27 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import './Guidelines.css';
 
 const Guidelines = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="guidelines-page">
       <div className="guidelines-container">
-        <h1>Hướng dẫn đánh giá</h1>
-        <p className="intro">
-          Để đảm bảo chất lượng và tính hữu ích của các đánh giá trên ReviewCompany,
-          vui lòng tuân theo các hướng dẫn sau đây.
-        </p>
+        <h1>{t('pages.guidelines.title')}</h1>
+        <p className="intro">{t('pages.guidelines.intro')}</p>
 
         <div className="cta-banner">
           <div className="cta-content">
-            <h3>Sẵn sàng chia sẻ trải nghiệm?</h3>
-            <p>Đánh giá của bạn sẽ giúp hàng nghìn người tìm được công ty phù hợp</p>
+            <h3>{t('pages.guidelines.ctaTitle')}</h3>
+            <p>{t('pages.guidelines.ctaDesc')}</p>
           </div>
-          <Link to="/write-review" className="cta-btn">Viết đánh giá ngay</Link>
+          <Link to="/write-review" className="cta-btn">{t('pages.guidelines.ctaBtn')}</Link>
         </div>
 
         <section className="guidelines-section">
           <div className="section-icon">✅</div>
-          <h2>Nên làm</h2>
+          <h2>{t('pages.guidelines.doTitle')}</h2>
           <ul>
             <li>
               <strong>Đánh giá trung thực</strong>
@@ -52,7 +52,7 @@ const Guidelines = () => {
 
         <section className="guidelines-section">
           <div className="section-icon">❌</div>
-          <h2>Không nên làm</h2>
+          <h2>{t('pages.guidelines.dontTitle')}</h2>
           <ul>
             <li>
               <strong>Thông tin sai sự thật</strong>
@@ -83,7 +83,7 @@ const Guidelines = () => {
 
         <section className="guidelines-section tips">
           <div className="section-icon">💡</div>
-          <h2>Mẹo viết đánh giá hay</h2>
+          <h2>{t('pages.guidelines.tipsTitle')}</h2>
           <div className="tips-grid">
             <div className="tip-card">
               <h3>Tiêu đề thu hút</h3>
@@ -106,7 +106,7 @@ const Guidelines = () => {
 
         <section className="guidelines-section">
           <div className="section-icon">⭐</div>
-          <h2>Hướng dẫn chấm điểm</h2>
+          <h2>{t('pages.guidelines.ratingGuide')}</h2>
           <div className="rating-guide">
             <div className="rating-item">
               <span className="rating-score bad">1-3</span>
@@ -148,7 +148,7 @@ const Guidelines = () => {
 
         <section className="guidelines-section">
           <div className="section-icon">⚖️</div>
-          <h2>Quy trình xét duyệt</h2>
+          <h2>{t('pages.guidelines.reviewProcess')}</h2>
           <p>Mỗi đánh giá sẽ được xem xét để đảm bảo tuân thủ hướng dẫn:</p>
           <ol className="review-process">
             <li>
@@ -184,12 +184,8 @@ const Guidelines = () => {
 
         <section className="guidelines-section">
           <div className="section-icon">🚨</div>
-          <h2>Báo cáo vi phạm</h2>
-          <p>
-            Nếu bạn phát hiện đánh giá vi phạm hướng dẫn, hãy báo cáo bằng cách click vào
-            nút "Báo cáo" trên mỗi đánh giá. Đội ngũ của chúng tôi sẽ xem xét và xử lý
-            trong vòng 24-48 giờ.
-          </p>
+          <h2>{t('pages.guidelines.reportTitle')}</h2>
+          <p>{t('pages.guidelines.reportDesc')}</p>
         </section>
       </div>
     </div>

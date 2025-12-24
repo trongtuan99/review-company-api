@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useCompanies, useCompany } from '../hooks';
 import { useReviewMutationsExtended } from '../hooks/useReviewMutationsExtended';
@@ -7,6 +8,7 @@ import StarRating from '../components/StarRating';
 import './WriteReview.css';
 
 const WriteReview = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedCompanyId = searchParams.get('company');
@@ -79,17 +81,17 @@ const WriteReview = () => {
   ];
 
   const employmentDurations = [
-    { value: 'less_than_1', label: 'Dưới 1 năm' },
-    { value: '1_to_3', label: '1 - 3 năm' },
-    { value: 'more_than_3', label: 'Trên 3 năm' },
+    { value: 'less_than_1', label: t('review.lessThan1Year') },
+    { value: '1_to_3', label: t('review.oneToThreeYears') },
+    { value: 'more_than_3', label: t('review.moreThan3Years') },
   ];
 
   const ratingCriteria = [
-    { key: 'work_environment_rating', label: 'Môi trường làm việc', icon: '🏢' },
-    { key: 'salary_benefits_rating', label: 'Lương & phúc lợi', icon: '💰' },
-    { key: 'management_rating', label: 'Sếp & quản lý', icon: '👔' },
-    { key: 'work_pressure_rating', label: 'Áp lực công việc', icon: '⏰' },
-    { key: 'culture_rating', label: 'Văn hóa công ty', icon: '🎯' },
+    { key: 'work_environment_rating', label: t('review.workEnvironment'), icon: '🏢' },
+    { key: 'salary_benefits_rating', label: t('review.salaryBenefits'), icon: '💰' },
+    { key: 'management_rating', label: t('review.management'), icon: '👔' },
+    { key: 'work_pressure_rating', label: t('review.workPressure'), icon: '⏰' },
+    { key: 'culture_rating', label: t('review.culture'), icon: '🎯' },
   ];
 
   const handleChange = (e) => {
@@ -136,17 +138,17 @@ const WriteReview = () => {
     setError('');
 
     if (!selectedCompanyId) {
-      setError('Vui lòng chọn công ty bạn muốn đánh giá');
+      setError(t('validation.selectCompany'));
       return;
     }
 
     if (!formData.title || formData.title.length < 5) {
-      setError('Tiêu đề phải có ít nhất 5 ký tự');
+      setError(t('validation.titleMinLength'));
       return;
     }
 
     if (!formData.reviews_content || formData.reviews_content.length < 20) {
-      setError('Nội dung đánh giá phải có ít nhất 20 ký tự');
+      setError(t('validation.contentMinLength'));
       return;
     }
 
@@ -183,7 +185,7 @@ const WriteReview = () => {
       await createReview({ companyId: selectedCompanyId, reviewData: submitData });
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || err.error || 'Không thể tạo đánh giá. Vui lòng thử lại.');
+      setError(err.message || err.error || t('validation.createReviewError'));
     }
   };
 
@@ -218,11 +220,11 @@ const WriteReview = () => {
         <div className="write-review-container">
           <div className="auth-required">
             <div className="auth-icon">🔒</div>
-            <h2>Đăng nhập để viết đánh giá</h2>
-            <p>Bạn cần đăng nhập để có thể chia sẻ trải nghiệm làm việc của mình.</p>
+            <h2>{t('auth.loginRequired')}</h2>
+            <p>{t('auth.loginRequiredDesc')}</p>
             <div className="auth-actions">
-              <Link to="/login" className="btn-primary">Đăng nhập</Link>
-              <Link to="/register" className="btn-secondary">Đăng ký</Link>
+              <Link to="/login" className="btn-primary">{t('auth.login')}</Link>
+              <Link to="/register" className="btn-secondary">{t('auth.register')}</Link>
             </div>
           </div>
         </div>
@@ -236,14 +238,14 @@ const WriteReview = () => {
         <div className="write-review-container">
           <div className="success-state">
             <div className="success-icon">✅</div>
-            <h2>Cảm ơn bạn đã đánh giá!</h2>
-            <p>Đánh giá của bạn đã được gửi thành công và sẽ được hiển thị sau khi được xét duyệt.</p>
+            <h2>{t('review.thankYouReview')}</h2>
+            <p>{t('review.reviewSubmitted')}</p>
             <div className="success-actions">
               <button onClick={() => navigate(`/companies/${selectedCompanyId}`)} className="btn-primary">
-                Xem công ty
+                {t('review.viewCompany')}
               </button>
               <button onClick={resetForm} className="btn-secondary">
-                Viết đánh giá khác
+                {t('review.writeAnotherReview')}
               </button>
             </div>
           </div>
@@ -256,16 +258,16 @@ const WriteReview = () => {
     <div className="write-review-page">
       <div className="write-review-container">
         <div className="page-header">
-          <h1>Viết đánh giá</h1>
-          <p>Chia sẻ trải nghiệm làm việc của bạn để giúp đỡ cộng đồng</p>
+          <h1>{t('review.writeReview')}</h1>
+          <p>{t('review.shareExperience')}</p>
         </div>
 
         <div className="guidelines-reminder">
           <div className="reminder-icon">💡</div>
           <div className="reminder-content">
-            <strong>Lưu ý khi viết đánh giá</strong>
-            <p>Đánh giá trung thực, cụ thể và cân bằng sẽ hữu ích nhất cho cộng đồng.
-              <Link to="/guidelines"> Xem hướng dẫn đầy đủ →</Link>
+            <strong>{t('review.guidelinesReminder')}</strong>
+            <p>{t('review.guidelinesDesc')}
+              <Link to="/guidelines"> {t('review.viewFullGuidelines')} →</Link>
             </p>
           </div>
         </div>
@@ -275,16 +277,16 @@ const WriteReview = () => {
         <form onSubmit={handleSubmit} className="review-form">
           {/* Company Selection */}
           <div className="form-section">
-            <h3>📍 Chọn công ty</h3>
+            <h3>📍 {t('review.selectCompany')}</h3>
             <div className="form-group company-search">
-              <label>Công ty bạn muốn đánh giá *</label>
+              <label>{t('review.companyToReview')} *</label>
               <div className="search-container">
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={handleSearchChange}
                   onFocus={() => setShowDropdown(true)}
-                  placeholder="Tìm kiếm công ty..."
+                  placeholder={t('review.searchCompany')}
                   className="search-input"
                 />
                 {showDropdown && searchTerm && companies.length > 0 && (
@@ -306,7 +308,7 @@ const WriteReview = () => {
               </div>
               {selectedCompany && (
                 <div className="selected-company">
-                  <span className="selected-label">Đã chọn:</span>
+                  <span className="selected-label">{t('common.selected')}:</span>
                   <span className="selected-name">{selectedCompany.name}</span>
                   <button
                     type="button"
@@ -325,17 +327,17 @@ const WriteReview = () => {
 
           {/* Employment Info */}
           <div className="form-section">
-            <h3>💼 Thông tin công việc</h3>
+            <h3>💼 {t('review.jobInfo')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label>Chức danh của bạn</label>
+                <label>{t('review.yourJobTitle')}</label>
                 <select
                   name="job_title"
                   value={formData.job_title}
                   onChange={handleChange}
                   className="form-select"
                 >
-                  <option value="">-- Chọn chức danh --</option>
+                  <option value="">-- {t('review.selectJobTitle')} --</option>
                   {commonJobTitles.map((title) => (
                     <option key={title} value={title}>{title}</option>
                   ))}
@@ -346,20 +348,20 @@ const WriteReview = () => {
                     name="custom_job_title"
                     value={formData.custom_job_title}
                     onChange={handleChange}
-                    placeholder="Nhập chức danh của bạn..."
+                    placeholder={t('review.enterJobTitle')}
                     className="form-input mt-2"
                   />
                 )}
               </div>
               <div className="form-group">
-                <label>Thời gian làm việc</label>
+                <label>{t('review.workDuration')}</label>
                 <select
                   name="employment_duration"
                   value={formData.employment_duration}
                   onChange={handleChange}
                   className="form-select"
                 >
-                  <option value="">-- Chọn thời gian --</option>
+                  <option value="">-- {t('review.selectDuration')} --</option>
                   {employmentDurations.map((d) => (
                     <option key={d.value} value={d.value}>{d.label}</option>
                   ))}
@@ -367,7 +369,7 @@ const WriteReview = () => {
               </div>
             </div>
             <div className="form-group">
-              <label>Trạng thái làm việc</label>
+              <label>{t('review.workStatus')}</label>
               <div className="radio-group">
                 <label className="radio-label">
                   <input
@@ -377,7 +379,7 @@ const WriteReview = () => {
                     checked={formData.employment_status === 'current'}
                     onChange={handleChange}
                   />
-                  <span>Đang làm việc</span>
+                  <span>{t('review.currentEmployee')}</span>
                 </label>
                 <label className="radio-label">
                   <input
@@ -387,7 +389,7 @@ const WriteReview = () => {
                     checked={formData.employment_status === 'former'}
                     onChange={handleChange}
                   />
-                  <span>Đã nghỉ việc</span>
+                  <span>{t('review.formerEmployee')}</span>
                 </label>
               </div>
             </div>
@@ -395,8 +397,8 @@ const WriteReview = () => {
 
           {/* Detailed Ratings */}
           <div className="form-section">
-            <h3>⭐ Đánh giá chi tiết</h3>
-            <p className="section-description">Đánh giá từng khía cạnh của công ty (1-10 điểm)</p>
+            <h3>⭐ {t('review.detailedRating')}</h3>
+            <p className="section-description">{t('review.ratingDesc')}</p>
 
             <div className="detailed-ratings">
               {ratingCriteria.map((criteria) => (
@@ -418,17 +420,17 @@ const WriteReview = () => {
             </div>
 
             <div className="overall-score-preview">
-              <span>Điểm tổng hợp:</span>
+              <span>{t('review.overallScore')}:</span>
               <span className="overall-value">{calculateOverallScore()}/10</span>
             </div>
           </div>
 
           {/* Review Content */}
           <div className="form-section">
-            <h3>📝 Nội dung đánh giá</h3>
+            <h3>📝 {t('review.reviewContent')}</h3>
 
             <div className="form-group">
-              <label>Tiêu đề đánh giá *</label>
+              <label>{t('review.reviewTitle')} *</label>
               <input
                 type="text"
                 name="title"
@@ -442,51 +444,51 @@ const WriteReview = () => {
             </div>
 
             <div className="form-group">
-              <label>Trải nghiệm tổng quan *</label>
+              <label>{t('review.overallExperienceLabel')} *</label>
               <textarea
                 name="reviews_content"
                 value={formData.reviews_content}
                 onChange={handleChange}
                 rows={4}
-                placeholder="Chia sẻ trải nghiệm chung của bạn khi làm việc tại công ty..."
+                placeholder={t('review.overallExperiencePlaceholder')}
                 className="form-textarea"
               />
-              <span className="char-count">{formData.reviews_content.length} ký tự (tối thiểu 20)</span>
+              <span className="char-count">{formData.reviews_content.length} {t('validation.minChars')}</span>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label>✅ Ưu điểm</label>
+                <label>✅ {t('review.pros')}</label>
                 <textarea
                   name="pros"
                   value={formData.pros}
                   onChange={handleChange}
                   rows={3}
-                  placeholder="Những điểm tích cực của công ty..."
+                  placeholder={t('review.prosPlaceholder')}
                   className="form-textarea pros-textarea"
                 />
               </div>
               <div className="form-group">
-                <label>❌ Nhược điểm</label>
+                <label>❌ {t('review.cons')}</label>
                 <textarea
                   name="cons"
                   value={formData.cons}
                   onChange={handleChange}
                   rows={3}
-                  placeholder="Những điểm cần cải thiện..."
+                  placeholder={t('review.consPlaceholder')}
                   className="form-textarea cons-textarea"
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>💡 Lời khuyên cho ban lãnh đạo</label>
+              <label>💡 {t('review.advice')}</label>
               <textarea
                 name="advice"
                 value={formData.advice}
                 onChange={handleChange}
                 rows={2}
-                placeholder="Bạn có đề xuất gì cho công ty? (tùy chọn)"
+                placeholder={t('review.advicePlaceholder')}
                 className="form-textarea"
               />
             </div>
@@ -494,7 +496,7 @@ const WriteReview = () => {
 
           {/* Recommendation & Privacy */}
           <div className="form-section">
-            <h3>🎯 Khuyến nghị & Tùy chọn</h3>
+            <h3>🎯 {t('review.recommendOptions')}</h3>
 
             <div className="form-group">
               <label className="checkbox-label recommend-checkbox">
@@ -505,7 +507,7 @@ const WriteReview = () => {
                   onChange={handleChange}
                 />
                 <span className="checkbox-icon">👍</span>
-                <span>Tôi khuyên bạn bè/người thân làm việc tại công ty này</span>
+                <span>{t('review.recommendFriends')}</span>
               </label>
             </div>
 
@@ -518,10 +520,10 @@ const WriteReview = () => {
                   onChange={handleChange}
                 />
                 <span className="checkbox-icon">🔒</span>
-                <span>Đánh giá ẩn danh</span>
+                <span>{t('review.anonymousReview')}</span>
               </label>
               <p className="form-hint">
-                Nếu chọn, tên của bạn sẽ không được hiển thị công khai.
+                {t('review.anonymousHint')}
               </p>
             </div>
           </div>
@@ -529,10 +531,10 @@ const WriteReview = () => {
           {/* Submit */}
           <div className="form-actions">
             <button type="button" onClick={() => navigate(-1)} className="btn-secondary">
-              Hủy
+              {t('common.cancel')}
             </button>
             <button type="submit" disabled={isCreating || !selectedCompanyId} className="btn-primary">
-              {isCreating ? 'Đang gửi...' : 'Gửi đánh giá'}
+              {isCreating ? t('common.sending') : t('review.submitReview')}
             </button>
           </div>
         </form>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { companyService } from '../services/companyService';
 import './CreateCompanyForm.css';
 
 const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -17,6 +19,10 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
     employee_count_min: '',
     employee_count_max: '',
     is_hiring: false,
+    logo: '',
+    description: '',
+    founded_year: '',
+    tech_stack: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -33,12 +39,12 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
     setError('');
 
     if (!formData.name || formData.name.trim().length < 2) {
-      setError('Tên công ty phải có ít nhất 2 ký tự');
+      setError(t('components.companyNameMin'));
       return;
     }
 
     if (!isAuthenticated) {
-      setError('Vui lòng đăng nhập để tạo công ty');
+      setError(t('components.pleaseLoginToCreate'));
       return;
     }
 
@@ -48,9 +54,10 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
         ...formData,
         employee_count_min: formData.employee_count_min ? parseInt(formData.employee_count_min) : null,
         employee_count_max: formData.employee_count_max ? parseInt(formData.employee_count_max) : null,
+        founded_year: formData.founded_year ? parseInt(formData.founded_year) : null,
       };
       const response = await companyService.createCompany(submitData);
-      
+
       if (response.status === 'ok' || response.status === 'success') {
         const company = response.data;
         if (onSuccess) {
@@ -59,10 +66,10 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
           navigate(`/companies/${company.id}`);
         }
       } else {
-        setError(response.message || 'Không thể tạo công ty');
+        setError(response.message || t('components.cannotCreateCompany'));
       }
     } catch (err) {
-      setError(err.message || err.error || 'Không thể tạo công ty');
+      setError(err.message || err.error || t('components.cannotCreateCompany'));
     } finally {
       setLoading(false);
     }
@@ -72,7 +79,7 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
     return (
       <div className="create-company-form">
         <div className="info-message">
-          <p>Vui lòng <a href="/login">đăng nhập</a> để tạo công ty mới.</p>
+          <p>{t('components.pleaseLoginToCreate')}. <Link to="/login">{t('nav.login')}</Link></p>
         </div>
       </div>
     );
@@ -80,11 +87,11 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
 
   return (
     <div className="create-company-form">
-      <h3>Tạo công ty mới</h3>
+      <h3>{t('components.createCompany')}</h3>
       {error && <div className="error-message">{error}</div>}
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Tên công ty *</label>
+          <label>{t('components.companyName')} *</label>
           <input
             type="text"
             name="name"
@@ -92,22 +99,22 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
             onChange={handleChange}
             required
             minLength={2}
-            placeholder="Tên công ty..."
+            placeholder={t('components.companyNamePlaceholder')}
           />
         </div>
         <div className="form-group">
-          <label>Chủ sở hữu *</label>
+          <label>{t('components.companyOwner')} *</label>
           <input
             type="text"
             name="owner"
             value={formData.owner}
             onChange={handleChange}
             required
-            placeholder="Tên chủ sở hữu..."
+            placeholder={t('components.ownerPlaceholder')}
           />
         </div>
         <div className="form-group">
-          <label>Số điện thoại</label>
+          <label>{t('auth.phone')}</label>
           <input
             type="tel"
             name="phone"
@@ -117,17 +124,17 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
           />
         </div>
         <div className="form-group">
-          <label>Văn phòng chính</label>
+          <label>{t('components.mainOffice')}</label>
           <input
             type="text"
             name="main_office"
             value={formData.main_office}
             onChange={handleChange}
-            placeholder="Địa chỉ văn phòng..."
+            placeholder={t('components.officePlaceholder')}
           />
         </div>
         <div className="form-group">
-          <label>Website</label>
+          <label>{t('company.website')}</label>
           <input
             type="url"
             name="website"
@@ -137,14 +144,56 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
           />
         </div>
         <div className="form-group">
-          <label>Ngành nghề</label>
+          <label>{t('components.logoUrl')}</label>
+          <input
+            type="url"
+            name="logo"
+            value={formData.logo}
+            onChange={handleChange}
+            placeholder="https://example.com/logo.png"
+          />
+        </div>
+        <div className="form-group">
+          <label>{t('components.foundedYear')}</label>
+          <input
+            type="number"
+            name="founded_year"
+            value={formData.founded_year}
+            onChange={handleChange}
+            placeholder={t('components.foundedYearExample')}
+            min="1900"
+            max={new Date().getFullYear()}
+          />
+        </div>
+        <div className="form-group">
+          <label>{t('components.companyDescription')}</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder={t('components.descriptionPlaceholder')}
+            rows={3}
+          />
+        </div>
+        <div className="form-group">
+          <label>{t('components.techStack')}</label>
+          <input
+            type="text"
+            name="tech_stack"
+            value={formData.tech_stack}
+            onChange={handleChange}
+            placeholder={t('components.techStackPlaceholder')}
+          />
+        </div>
+        <div className="form-group">
+          <label>{t('company.industry')}</label>
           <select
             name="industry"
             value={formData.industry}
             onChange={handleChange}
             className="form-select"
           >
-            <option value="">-- Chọn ngành nghề --</option>
+            <option value="">{t('components.selectIndustry')}</option>
             <option value="CNTT - Phần mềm">CNTT - Phần mềm</option>
             <option value="Giáo dục">Giáo dục</option>
             <option value="Bán hàng/ Kinh doanh">Bán hàng/ Kinh doanh</option>
@@ -160,14 +209,14 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
           </select>
         </div>
         <div className="form-group">
-          <label>Quy mô nhân viên</label>
+          <label>{t('components.employeeScale')}</label>
           <div className="employee-count-group">
             <input
               type="number"
               name="employee_count_min"
               value={formData.employee_count_min}
               onChange={handleChange}
-              placeholder="Từ"
+              placeholder={t('components.from')}
               min="0"
               className="employee-count-input"
             />
@@ -177,7 +226,7 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
               name="employee_count_max"
               value={formData.employee_count_max}
               onChange={handleChange}
-              placeholder="Đến"
+              placeholder={t('components.to')}
               min="0"
               className="employee-count-input"
             />
@@ -191,17 +240,17 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
               checked={formData.is_hiring}
               onChange={(e) => setFormData({ ...formData, is_hiring: e.target.checked })}
             />
-            <span>Đang tuyển dụng</span>
+            <span>{t('components.isHiring')}</span>
           </label>
         </div>
         <div className="form-actions">
           {onCancel && (
             <button type="button" onClick={onCancel} className="btn-secondary">
-              Hủy
+              {t('common.cancel')}
             </button>
           )}
           <button type="submit" disabled={loading} className="btn-primary">
-            {loading ? 'Đang tạo...' : 'Tạo công ty'}
+            {loading ? t('components.creating') : t('components.createCompany')}
           </button>
         </div>
       </form>
@@ -210,4 +259,3 @@ const CreateCompanyForm = ({ searchQuery, onSuccess, onCancel }) => {
 };
 
 export default CreateCompanyForm;
-

@@ -2,9 +2,10 @@ class CompanySerializer < BaseSerializer
   attributes :id, :name, :owner, :logo, :website, :phone,
              :main_office, :created_at, :updated_at,
              :total_reviews, :avg_score, :company_size, :company_type,
-             :created_at_timestamp, :updated_at_timestamp, :is_active, :logo,
-             :avg_score, :is_good_company, :is_deleted, :industry,
-             :employee_count_min, :employee_count_max, :is_hiring, :employee_count_range
+             :created_at_timestamp, :updated_at_timestamp, :is_active,
+             :is_good_company, :is_deleted, :industry,
+             :employee_count_min, :employee_count_max, :is_hiring, :employee_count_range,
+             :description, :founded_year, :tech_stack, :benefits, :social_links
 
   def employee_count_range
     return nil unless object.employee_count_min || object.employee_count_max

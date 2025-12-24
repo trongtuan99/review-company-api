@@ -29,6 +29,82 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+.company-header-content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.company-logo {
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--glassdoor-white);
+  border: 1px solid var(--glassdoor-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.company-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.company-header-info {
+  flex: 1;
+}
+
+.company-description {
+  margin-top: 16px;
+  color: var(--glassdoor-gray-light);
+  font-size: 15px;
+  line-height: 1.6;
+  max-width: 700px;
+}
+
+.company-industry {
+  background: var(--glassdoor-blue-light);
+  color: var(--glassdoor-blue);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.company-founded {
+  color: var(--glassdoor-gray-light);
+  font-size: 14px;
+}
+
+.hiring-badge {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-value.tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .company-title-section {
   display: flex;
   justify-content: space-between;
@@ -525,6 +601,145 @@
 
   .rating-bar-container {
     flex: 1;
+  }
+}
+
+/* Modal Styles */
+.company-detail-container .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 40px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.company-detail-container .modal-content {
+  background: var(--glassdoor-white);
+  border-radius: 16px;
+  max-width: 800px !important;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.company-detail-container .modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 50%;
+  font-size: 24px;
+  color: var(--glassdoor-gray-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.company-detail-container .modal-close:hover {
+  background: var(--glassdoor-border);
+  color: var(--glassdoor-gray);
+}
+
+/* Adjust form inside modal */
+.company-detail-container .modal-content .create-review-form {
+  margin: 0;
+  border: none;
+  box-shadow: none;
+  border-radius: 16px;
+}
+
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) {
+  .company-detail-container .modal-overlay {
+    padding: 24px;
+  }
+
+  .company-detail-container .modal-content {
+    max-width: 90% !important;
+    max-height: 88vh;
+  }
+}
+
+/* Mobile (< 768px) */
+@media (max-width: 768px) {
+  .company-detail-container .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .company-detail-container .modal-content {
+    max-width: 100% !important;
+    max-height: 92vh;
+    border-radius: 20px 20px 0 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+
+  .company-detail-container .modal-content .create-review-form {
+    padding: 20px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .company-detail-container .modal-close {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+  }
+
+  @keyframes slideUpMobile {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Small mobile (< 480px) */
+@media (max-width: 480px) {
+  .company-detail-container .modal-content {
+    max-height: 95vh;
+  }
+
+  .company-detail-container .modal-content .create-review-form {
+    padding: 16px;
   }
 }
 

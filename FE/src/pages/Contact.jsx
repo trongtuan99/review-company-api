@@ -1,7 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { contactService } from '../services/contactService';
 import './Contact.css';
 
 const Contact = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -9,43 +12,53 @@ const Contact = () => {
     message: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would send the data to an API
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
+    setLoading(true);
+    setError('');
+
+    try {
+      await contactService.sendMessage(formData);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err.message || t('pages.contact.errorMessage'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="contact-page">
       <div className="contact-container">
         <div className="contact-header">
-          <h1>Liên hệ với chúng tôi</h1>
-          <p>Chúng tôi luôn sẵn sàng lắng nghe ý kiến của bạn</p>
+          <h1>{t('pages.contact.title')}</h1>
+          <p>{t('pages.contact.subtitle')}</p>
         </div>
 
         <div className="contact-content">
           <div className="contact-info">
-            <h2>Thông tin liên hệ</h2>
+            <h2>{t('pages.contact.contactInfo')}</h2>
 
             <div className="info-item">
               <div className="info-icon">📍</div>
               <div>
-                <h3>Địa chỉ</h3>
-                <p>123 Đường ABC, Quận XYZ<br />TP. Hồ Chí Minh, Việt Nam</p>
+                <h3>{t('pages.contact.address')}</h3>
+                <p>{t('footer.address')}</p>
               </div>
             </div>
 
             <div className="info-item">
               <div className="info-icon">📧</div>
               <div>
-                <h3>Email</h3>
+                <h3>{t('auth.email')}</h3>
                 <p>
                   <a href="mailto:contact@reviewcompany.com">contact@reviewcompany.com</a>
                 </p>
@@ -58,16 +71,16 @@ const Contact = () => {
             <div className="info-item">
               <div className="info-icon">📞</div>
               <div>
-                <h3>Điện thoại</h3>
+                <h3>{t('pages.contact.phone')}</h3>
                 <p><a href="tel:+84123456789">+84 123 456 789</a></p>
-                <p className="sub-text">Thứ 2 - Thứ 6: 8:00 - 17:00</p>
+                <p className="sub-text">{t('pages.contact.phoneHours')}</p>
               </div>
             </div>
 
             <div className="info-item">
               <div className="info-icon">💬</div>
               <div>
-                <h3>Mạng xã hội</h3>
+                <h3>{t('pages.contact.socialMedia')}</h3>
                 <div className="social-links">
                   <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
                   <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">LinkedIn</a>
@@ -78,22 +91,24 @@ const Contact = () => {
           </div>
 
           <div className="contact-form-wrapper">
-            <h2>Gửi tin nhắn</h2>
+            <h2>{t('pages.contact.sendMessage')}</h2>
+
+            {error && <div className="error-message">{error}</div>}
 
             {submitted ? (
               <div className="success-message">
                 <div className="success-icon">✅</div>
-                <h3>Cảm ơn bạn!</h3>
-                <p>Tin nhắn của bạn đã được gửi thành công. Chúng tôi sẽ phản hồi trong vòng 24 giờ.</p>
-                <button onClick={() => { setSubmitted(false); setFormData({ name: '', email: '', subject: '', message: '' }); }}>
-                  Gửi tin nhắn khác
+                <h3>{t('pages.contact.thankYou')}</h3>
+                <p>{t('pages.contact.messageSent')}</p>
+                <button onClick={() => { setSubmitted(false); setError(''); setFormData({ name: '', email: '', subject: '', message: '' }); }}>
+                  {t('pages.contact.sendAnother')}
                 </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="contact-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="name">Họ và tên *</label>
+                    <label htmlFor="name">{t('pages.contact.fullName')} *</label>
                     <input
                       type="text"
                       id="name"
@@ -101,11 +116,11 @@ const Contact = () => {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      placeholder="Nguyễn Văn A"
+                      placeholder="John Doe"
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="email">Email *</label>
+                    <label htmlFor="email">{t('auth.email')} *</label>
                     <input
                       type="email"
                       id="email"
@@ -119,7 +134,7 @@ const Contact = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="subject">Chủ đề *</label>
+                  <label htmlFor="subject">{t('pages.contact.subject')} *</label>
                   <select
                     id="subject"
                     name="subject"
@@ -127,18 +142,18 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                   >
-                    <option value="">Chọn chủ đề</option>
-                    <option value="general">Câu hỏi chung</option>
-                    <option value="support">Hỗ trợ kỹ thuật</option>
-                    <option value="feedback">Góp ý & Phản hồi</option>
-                    <option value="business">Hợp tác kinh doanh</option>
-                    <option value="report">Báo cáo vi phạm</option>
-                    <option value="other">Khác</option>
+                    <option value="">{t('pages.contact.selectSubject')}</option>
+                    <option value="general">{t('pages.contact.subjectGeneral')}</option>
+                    <option value="support">{t('pages.contact.subjectSupport')}</option>
+                    <option value="feedback">{t('pages.contact.subjectFeedback')}</option>
+                    <option value="business">{t('pages.contact.subjectBusiness')}</option>
+                    <option value="report">{t('pages.contact.subjectReport')}</option>
+                    <option value="other">{t('pages.contact.subjectOther')}</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="message">Nội dung *</label>
+                  <label htmlFor="message">{t('pages.contact.content')} *</label>
                   <textarea
                     id="message"
                     name="message"
@@ -146,12 +161,12 @@ const Contact = () => {
                     onChange={handleChange}
                     required
                     rows={5}
-                    placeholder="Nhập nội dung tin nhắn..."
+                    placeholder={t('pages.contact.contentPlaceholder')}
                   />
                 </div>
 
-                <button type="submit" className="submit-btn">
-                  Gửi tin nhắn
+                <button type="submit" className="submit-btn" disabled={loading}>
+                  {loading ? t('common.sending') : t('pages.contact.submit')}
                 </button>
               </form>
             )}
@@ -159,11 +174,11 @@ const Contact = () => {
         </div>
 
         <div className="map-section">
-          <h2>Vị trí của chúng tôi</h2>
+          <h2>{t('pages.contact.ourLocation')}</h2>
           <div className="map-placeholder">
             <div className="map-icon">🗺️</div>
-            <p>Bản đồ Google Maps</p>
-            <span>123 Đường ABC, Quận XYZ, TP. Hồ Chí Minh</span>
+            <p>{t('pages.contact.googleMaps')}</p>
+            <span>{t('footer.address')}</span>
           </div>
         </div>
       </div>

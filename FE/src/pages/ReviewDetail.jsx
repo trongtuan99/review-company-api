@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { reviewService } from '../services/reviewService';
 import './ReviewDetail.css';
@@ -9,6 +10,7 @@ const ReviewDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   const { data: reviewResponse, isLoading, error } = useQuery({
     queryKey: ['review', id],
@@ -73,7 +75,7 @@ const ReviewDetail = () => {
   };
 
   if (isLoading) {
-    return <div className="loading">Dang tai...</div>;
+    return <div className="loading">{t('common.loading')}</div>;
   }
 
   if (error || !review) {
@@ -81,9 +83,9 @@ const ReviewDetail = () => {
       <div className="review-detail-page">
         <div className="review-detail-container">
           <button onClick={() => navigate(-1)} className="back-link">
-            ← Quay lai
+            ← {t('common.back')}
           </button>
-          <div className="error">Khong tim thay danh gia</div>
+          <div className="error">{t('review.notFound')}</div>
         </div>
       </div>
     );
@@ -91,18 +93,18 @@ const ReviewDetail = () => {
 
   const parsedContent = parseContent(review.reviews_content);
   const detailedRatings = [
-    { key: 'work_environment_rating', label: 'Moi truong lam viec', icon: '🏢', value: review.work_environment_rating },
-    { key: 'salary_benefits_rating', label: 'Luong & phuc loi', icon: '💰', value: review.salary_benefits_rating },
-    { key: 'management_rating', label: 'Sep & quan ly', icon: '👔', value: review.management_rating },
-    { key: 'work_pressure_rating', label: 'Ap luc cong viec', icon: '⏰', value: review.work_pressure_rating },
-    { key: 'culture_rating', label: 'Van hoa cong ty', icon: '🎯', value: review.culture_rating },
+    { key: 'work_environment_rating', label: t('review.workEnvironment'), icon: '🏢', value: review.work_environment_rating },
+    { key: 'salary_benefits_rating', label: t('review.salaryBenefits'), icon: '💰', value: review.salary_benefits_rating },
+    { key: 'management_rating', label: t('review.management'), icon: '👔', value: review.management_rating },
+    { key: 'work_pressure_rating', label: t('review.workPressure'), icon: '⏰', value: review.work_pressure_rating },
+    { key: 'culture_rating', label: t('review.culture'), icon: '🎯', value: review.culture_rating },
   ].filter(r => r.value > 0);
 
   return (
     <div className="review-detail-page">
       <div className="review-detail-container">
         <button onClick={() => navigate(-1)} className="back-link">
-          ← Quay lai
+          ← {t('common.back')}
         </button>
 
         <div className="review-detail-card">
@@ -110,7 +112,7 @@ const ReviewDetail = () => {
           <div className="review-detail-header">
             <div className="review-company-info">
               <Link to={`/companies/${review.company_id}`} className="company-link">
-                {review.company?.name || 'Cong ty'}
+                {review.company?.name || t('home.statCompanies')}
               </Link>
               {review.job_title && (
                 <span className="job-title">{review.job_title}</span>
@@ -127,7 +129,7 @@ const ReviewDetail = () => {
           {/* Meta */}
           <div className="review-meta">
             <span className="review-author">
-              {review.is_anonymous ? 'Nguoi dung an danh' : `${review.user?.first_name || ''} ${review.user?.last_name || ''}`}
+              {review.is_anonymous ? t('review.anonymousUser') : `${review.user?.first_name || ''} ${review.user?.last_name || ''}`}
             </span>
             <span className="meta-separator">•</span>
             <span className="review-date">
@@ -141,7 +143,7 @@ const ReviewDetail = () => {
               <>
                 <span className="meta-separator">•</span>
                 <span className="employment-status">
-                  {review.employment_status === 'current' ? 'Dang lam viec' : 'Da nghi viec'}
+                  {review.employment_status === 'current' ? t('review.currentEmployee') : t('review.formerEmployee')}
                 </span>
               </>
             )}
@@ -149,9 +151,9 @@ const ReviewDetail = () => {
               <>
                 <span className="meta-separator">•</span>
                 <span className="employment-duration">
-                  {review.employment_duration === 'less_than_1' && 'Duoi 1 nam'}
-                  {review.employment_duration === '1_to_3' && '1-3 nam'}
-                  {review.employment_duration === 'more_than_3' && 'Tren 3 nam'}
+                  {review.employment_duration === 'less_than_1' && t('review.lessThan1Year')}
+                  {review.employment_duration === '1_to_3' && t('review.oneToThreeYears')}
+                  {review.employment_duration === 'more_than_3' && t('review.moreThan3Years')}
                 </span>
               </>
             )}
@@ -160,14 +162,14 @@ const ReviewDetail = () => {
           {/* Recommend Badge */}
           {review.would_recommend !== undefined && (
             <div className={`recommend-badge ${review.would_recommend ? 'positive' : 'negative'}`}>
-              {review.would_recommend ? '👍 Khuyen ban be lam tai day' : '👎 Khong khuyen ban be lam tai day'}
+              {review.would_recommend ? `👍 ${t('review.wouldRecommend')}` : `👎 ${t('review.wouldNotRecommend')}`}
             </div>
           )}
 
           {/* Detailed Ratings */}
           {detailedRatings.length > 0 && (
             <div className="detailed-ratings-box">
-              <h3>Danh gia chi tiet</h3>
+              <h3>{t('review.detailedRatings')}</h3>
               <div className="ratings-list">
                 {detailedRatings.map((rating) => (
                   <div key={rating.key} className="rating-item">
@@ -188,14 +190,14 @@ const ReviewDetail = () => {
 
           {/* Main Content */}
           <div className="review-content-section">
-            <h3>Trai nghiem tong quan</h3>
+            <h3>{t('review.overallExperience')}</h3>
             <p className="review-content">{parsedContent.main}</p>
           </div>
 
           {/* Pros */}
           {parsedContent.pros && (
             <div className="review-content-section pros-section">
-              <h3>✅ Uu diem</h3>
+              <h3>✅ {t('review.pros')}</h3>
               <p>{parsedContent.pros}</p>
             </div>
           )}
@@ -203,7 +205,7 @@ const ReviewDetail = () => {
           {/* Cons */}
           {parsedContent.cons && (
             <div className="review-content-section cons-section">
-              <h3>❌ Nhuoc diem</h3>
+              <h3>❌ {t('review.cons')}</h3>
               <p>{parsedContent.cons}</p>
             </div>
           )}
@@ -211,7 +213,7 @@ const ReviewDetail = () => {
           {/* Advice */}
           {parsedContent.advice && (
             <div className="review-content-section advice-section">
-              <h3>💡 Loi khuyen cho ban lanh dao</h3>
+              <h3>💡 {t('review.advice')}</h3>
               <p>{parsedContent.advice}</p>
             </div>
           )}
@@ -220,22 +222,22 @@ const ReviewDetail = () => {
           <div className="review-stats">
             <div className="stat-item">
               <span className="stat-icon">👍</span>
-              <span>{review.likes_count || 0} huu ich</span>
+              <span>{review.likes_count || 0} {t('review.helpful')}</span>
             </div>
             <div className="stat-item">
               <span className="stat-icon">💬</span>
-              <span>{review.replies_count || 0} binh luan</span>
+              <span>{review.replies_count || 0} {t('review.comments')}</span>
             </div>
           </div>
 
           {/* Actions */}
           <div className="review-actions">
             <Link to={`/companies/${review.company_id}`} className="btn-primary">
-              Xem cong ty
+              {t('review.viewCompany')}
             </Link>
             {isAuthenticated && (
               <Link to={`/write-review?company=${review.company_id}`} className="btn-secondary">
-                Viet danh gia
+                {t('review.writeReview')}
               </Link>
             )}
           </div>

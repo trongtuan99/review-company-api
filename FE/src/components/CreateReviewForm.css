@@ -231,6 +231,73 @@
   background: var(--glassdoor-gray-bg);
 }
 
+/* Section Hint */
+.create-review-form .section-hint {
+  font-size: 13px;
+  color: var(--glassdoor-gray-light);
+  margin-bottom: 16px;
+}
+
+/* Detailed Ratings Grid */
+.detailed-ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.rating-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-item label {
+  font-size: 14px;
+  color: var(--glassdoor-gray);
+  font-weight: 500;
+}
+
+.mini-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mini-star {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: var(--glassdoor-border);
+  cursor: pointer;
+  padding: 2px;
+  transition: color 0.2s, transform 0.1s;
+}
+
+.mini-star:hover {
+  transform: scale(1.2);
+}
+
+.mini-star.active {
+  color: #fbbf24;
+}
+
+.clear-rating {
+  background: none;
+  border: none;
+  color: var(--glassdoor-gray-light);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px 8px;
+  margin-left: 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.clear-rating:hover {
+  background: var(--glassdoor-gray-bg);
+  color: var(--glassdoor-gray);
+}
+
 /* Responsive - Mobile */
 @media (max-width: 768px) {
   .create-review-form {

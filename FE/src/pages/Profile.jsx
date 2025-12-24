@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useFavorites, useFavoriteMutations, useUserActivityStats, useUserRecentComments, useUserReviews } from '../hooks';
 import ProtectedRoute from '../components/ProtectedRoute';
@@ -8,6 +9,7 @@ import EditProfileModal from '../components/EditProfileModal';
 import './Profile.css';
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { user, logout, updateUser, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [showEditModal, setShowEditModal] = useState(false);
@@ -51,7 +53,7 @@ const Profile = () => {
     try {
       await removeFavoriteAsync(companyIdToRemove);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Không thể xóa khỏi danh sách yêu thích';
+      const errorMessage = err.response?.data?.message || err.message || t('company.cannotUpdateFavorite');
       alert(errorMessage);
     } finally {
       setCompanyIdToRemove(null);
@@ -65,10 +67,10 @@ const Profile = () => {
 
   const getGenderLabel = (gender) => {
     switch (gender) {
-      case 'male': return 'Nam';
-      case 'female': return 'Nữ';
-      case 'other': return 'Khác';
-      default: return 'Chưa cập nhật';
+      case 'male': return t('auth.male');
+      case 'female': return t('auth.female');
+      case 'other': return t('auth.other');
+      default: return t('auth.notUpdated');
     }
   };
 
@@ -85,15 +87,15 @@ const Profile = () => {
               <div className="user-details">
                 <h1>{user?.first_name} {user?.last_name}</h1>
                 <p className="user-email">{user?.email}</p>
-                <span className="role-badge">{user?.role?.name || 'Người dùng'}</span>
+                <span className="role-badge">{user?.role?.name || t('admin.users')}</span>
               </div>
             </div>
             <div className="profile-actions-top">
               <button className="btn-edit" onClick={() => setShowEditModal(true)}>
-                Chỉnh sửa
+                {t('common.edit')}
               </button>
               <button className="btn-logout" onClick={handleLogout}>
-                Đăng xuất
+                {t('nav.logout')}
               </button>
             </div>
           </div>
@@ -102,19 +104,19 @@ const Profile = () => {
           <div className="stats-bar">
             <div className="stat-item">
               <span className="stat-value">{activityStats.reviews_count || 0}</span>
-              <span className="stat-label">Đánh giá</span>
+              <span className="stat-label">{t('home.statReviews')}</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">{activityStats.replies_count || 0}</span>
-              <span className="stat-label">Bình luận</span>
+              <span className="stat-label">{t('review.comments')}</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">{activityStats.likes_count || 0}</span>
-              <span className="stat-label">Lượt thích</span>
+              <span className="stat-label">{t('review.helpful')}</span>
             </div>
             <div className="stat-item">
               <span className="stat-value">{favoriteCompanies.length}</span>
-              <span className="stat-label">Yêu thích</span>
+              <span className="stat-label">{t('company.addToFavorites')}</span>
             </div>
           </div>
         </div>
@@ -123,31 +125,31 @@ const Profile = () => {
         <div className="profile-main">
           {/* Quick Info Card */}
           <div className="quick-info-card">
-            <h3>Thông tin cá nhân</h3>
+            <h3>{t('profile.myProfile')}</h3>
             <div className="info-grid">
               <div className="info-item">
-                <span className="info-label">Họ và tên</span>
+                <span className="info-label">{t('auth.lastName')} {t('auth.firstName')}</span>
                 <span className="info-value">{user?.first_name} {user?.last_name}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Email</span>
+                <span className="info-label">{t('auth.email')}</span>
                 <span className="info-value">{user?.email}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Giới tính</span>
+                <span className="info-label">{t('auth.gender')}</span>
                 <span className="info-value">{getGenderLabel(user?.gender)}</span>
               </div>
               <div className="info-item">
-                <span className="info-label">Vai trò</span>
-                <span className="info-value">{user?.role?.name || 'Người dùng'}</span>
+                <span className="info-label">{t('admin.roles')}</span>
+                <span className="info-value">{user?.role?.name || t('admin.users')}</span>
               </div>
             </div>
             <div className="quick-actions">
               <Link to="/write-review" className="quick-action-btn primary">
-                Viết đánh giá
+                {t('review.writeReview')}
               </Link>
               <Link to="/companies" className="quick-action-btn secondary">
-                Khám phá công ty
+                {t('nav.allCompanies')}
               </Link>
             </div>
           </div>
@@ -159,19 +161,19 @@ const Profile = () => {
                 className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
                 onClick={() => setActiveTab('reviews')}
               >
-                Đánh giá của tôi ({userReviews.length})
+                {t('profile.myReviews')} ({userReviews.length})
               </button>
               <button
                 className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
                 onClick={() => setActiveTab('favorites')}
               >
-                Công ty yêu thích ({favoriteCompanies.length})
+                {t('profile.myFavorites')} ({favoriteCompanies.length})
               </button>
               <button
                 className={`tab-btn ${activeTab === 'comments' ? 'active' : ''}`}
                 onClick={() => setActiveTab('comments')}
               >
-                Bình luận ({recentComments.length})
+                {t('review.comments')} ({recentComments.length})
               </button>
             </div>
 
@@ -179,16 +181,16 @@ const Profile = () => {
               {activeTab === 'reviews' && (
                 <div className="reviews-tab">
                   {reviewsLoading ? (
-                    <div className="loading-state">Đang tải...</div>
+                    <div className="loading-state">{t('common.loading')}</div>
                   ) : reviewsError ? (
                     <div className="empty-state">
-                      <p>Không thể tải đánh giá: {reviewsError.message || 'Lỗi không xác định'}</p>
-                      <button onClick={() => refetchUserReviews()} className="cta-link">Thử lại</button>
+                      <p>{t('common.cannotLoad')}: {reviewsError.message || t('common.unknownError')}</p>
+                      <button onClick={() => refetchUserReviews()} className="cta-link">{t('common.retry')}</button>
                     </div>
                   ) : userReviews.length === 0 ? (
                     <div className="empty-state">
-                      <p>Bạn chưa viết đánh giá nào</p>
-                      <Link to="/write-review" className="cta-link">Viết đánh giá đầu tiên →</Link>
+                      <p>{t('profile.noReviewsYet')}</p>
+                      <Link to="/write-review" className="cta-link">{t('review.writeReview')} →</Link>
                     </div>
                   ) : (
                     <div className="reviews-list">
@@ -196,7 +198,7 @@ const Profile = () => {
                         <div key={review.id} className="review-card">
                           <div className="review-card-header">
                             <Link to={`/companies/${review.company_id}`} className="company-name">
-                              {review.company?.name || 'Công ty'}
+                              {review.company?.name || t('common.company')}
                             </Link>
                             <div className="review-score">⭐ {review.score}/10</div>
                           </div>
@@ -215,9 +217,9 @@ const Profile = () => {
                             </div>
                             {review.status && (
                               <span className={`status-badge ${review.status}`}>
-                                {review.status === 'pending' && 'Chờ duyệt'}
-                                {review.status === 'approved' && 'Đã duyệt'}
-                                {review.status === 'rejected' && 'Từ chối'}
+                                {review.status === 'pending' && t('admin.statusPending')}
+                                {review.status === 'approved' && t('admin.statusApproved')}
+                                {review.status === 'rejected' && t('admin.statusRejected')}
                               </span>
                             )}
                           </div>
@@ -231,11 +233,11 @@ const Profile = () => {
               {activeTab === 'favorites' && (
                 <div className="favorites-tab">
                   {favoritesLoading ? (
-                    <div className="loading-state">Đang tải...</div>
+                    <div className="loading-state">{t('common.loading')}</div>
                   ) : favoriteCompanies.length === 0 ? (
                     <div className="empty-state">
-                      <p>Bạn chưa yêu thích công ty nào</p>
-                      <Link to="/companies" className="cta-link">Khám phá công ty →</Link>
+                      <p>{t('profile.noFavoritesYet')}</p>
+                      <Link to="/companies" className="cta-link">{t('nav.allCompanies')} →</Link>
                     </div>
                   ) : (
                     <div className="favorites-grid">
@@ -247,7 +249,7 @@ const Profile = () => {
                               <span className="favorite-score">⭐ {company.avg_score?.toFixed(1) || '0.0'}</span>
                             </div>
                             <div className="favorite-info">
-                              <span>{company.total_reviews || 0} đánh giá</span>
+                              <span>{company.total_reviews || 0} {t('common.reviews')}</span>
                               {company.main_office && <span>📍 {company.main_office}</span>}
                             </div>
                           </Link>
@@ -269,8 +271,8 @@ const Profile = () => {
                 <div className="comments-tab">
                   {recentComments.length === 0 ? (
                     <div className="empty-state">
-                      <p>Bạn chưa có bình luận nào</p>
-                      <Link to="/companies" className="cta-link">Khám phá và bình luận →</Link>
+                      <p>{t('profile.noCommentsYet')}</p>
+                      <Link to="/companies" className="cta-link">{t('nav.allCompanies')} →</Link>
                     </div>
                   ) : (
                     <div className="comments-list">
@@ -282,7 +284,7 @@ const Profile = () => {
                             </span>
                             {reply.review && (
                               <Link to={`/companies/${reply.review.company_id}`} className="comment-review-link">
-                                {reply.review.title || 'Đánh giá'}
+                                {reply.review.title || t('common.review')}
                               </Link>
                             )}
                           </div>
@@ -312,10 +314,10 @@ const Profile = () => {
             setCompanyIdToRemove(null);
           }}
           onConfirm={handleRemoveFavorite}
-          title="Xóa khỏi danh sách yêu thích"
-          message="Bạn có chắc chắn muốn xóa công ty này?"
-          confirmText="Xóa"
-          cancelText="Hủy"
+          title={t('company.removeFromFavorites')}
+          message={t('profile.confirmRemoveFavorite')}
+          confirmText={t('common.delete')}
+          cancelText={t('common.cancel')}
           type="danger"
         />
       </div>

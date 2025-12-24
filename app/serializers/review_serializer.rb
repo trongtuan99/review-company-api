@@ -1,7 +1,9 @@
 class ReviewSerializer < BaseSerializer
   attributes :id, :title, :reviews_content, :score, :vote_for_quit, :vote_for_work,
              :is_anonymous, :job_title, :user_id, :created_at, :updated_at, :company_id, :created_at_timestamp,
-             :updated_at_timestamp, :total_like, :total_dislike, :total_reply, :user_like_status, :user_name
+             :updated_at_timestamp, :total_like, :total_dislike, :total_reply, :user_like_status, :user_name,
+             :pros, :cons, :salary_satisfaction, :work_life_balance, :career_growth,
+             :management_rating, :culture_rating, :employment_status, :years_employed
   belongs_to :company, serializer: CompanySerializer
 
   def user_like_status

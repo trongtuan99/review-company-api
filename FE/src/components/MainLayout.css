@@ -5,7 +5,6 @@
   flex-direction: column;
   background-color: var(--glassdoor-gray-bg);
   position: relative;
-  overflow-x: hidden;
 }
 
 .main-content-wrapper {
@@ -17,8 +16,6 @@
   margin: 0 auto;
   padding: 0;
   background: var(--glassdoor-gray-bg);
-  height: 100%;
-  overflow-x: hidden;
   position: relative;
 }
 

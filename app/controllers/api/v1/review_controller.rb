@@ -1,8 +1,10 @@
 class Api::V1::ReviewController < ApplicationController
-  around_action :with_transaction, except: %i[index recent all]
-  before_action :authenticate_user!, except: %i[index recent all]
+  include AdminTrackable
+
+  around_action :with_transaction, except: %i[index show recent all]
+  before_action :authenticate_user!, except: %i[index show recent all]
   before_action :get_company, only: [:create, :index]
-  before_action :get_review, only: [:update, :delete_review, :like, :dislike]
+  before_action :get_review, only: [:show, :update, :delete_review, :like, :dislike]
   before_action :validate_update, only: :update
   before_action :validate_delete_permission, only: :delete_review
   before_action :get_like_record, only: [:like, :dislike]
@@ -40,6 +42,14 @@ class Api::V1::ReviewController < ApplicationController
     render json: response_data
   end
 
+  def show
+    render json: json_with_success(
+      data: @review,
+      default_serializer: ReviewSerializer,
+      options: { scope: current_user }
+    )
+  end
+
   def create
     create_payload = create_update_params.merge!(company_id: @company.id)
     create_payload.merge!(user_id: current_user.id)
@@ -54,6 +64,7 @@ class Api::V1::ReviewController < ApplicationController
 
   def delete_review
     @review.update_attribute(:is_deleted, true)
+    track_admin_action('delete', @review)
     render json: json_with_empty_success
   end
 
@@ -192,7 +203,10 @@ class Api::V1::ReviewController < ApplicationController
   end
 
   def create_update_params
-    params.require(:review).permit(:title, :reviews_content, :score, :job_title, :is_anonymous)
+    params.require(:review).permit(:title, :reviews_content, :score, :job_title, :is_anonymous,
+                                    :pros, :cons, :salary_satisfaction, :work_life_balance,
+                                    :career_growth, :management_rating, :culture_rating,
+                                    :employment_status, :years_employed)
   end
 
   def get_like_record

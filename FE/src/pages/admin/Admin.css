@@ -258,17 +258,135 @@
   gap: 12px;
   font-size: 14px;
   color: var(--glassdoor-gray);
+  padding: 8px 0;
+  border-bottom: 1px solid var(--glassdoor-border);
+}
+
+.activity-item:last-child {
+  border-bottom: none;
 }
 
 .activity-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .activity-dot.green { background: #10b981; }
 .activity-dot.blue { background: #3b82f6; }
 .activity-dot.red { background: #ef4444; }
+.activity-dot.purple { background: #8b5cf6; }
+.activity-dot.gray { background: #6b7280; }
+
+.activity-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.activity-message {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: var(--glassdoor-gray-light);
+  flex-shrink: 0;
+}
+
+.empty-state.small {
+  padding: 20px;
+}
+
+.empty-state.small span {
+  font-size: 32px;
+}
+
+.empty-state.small p {
+  font-size: 13px;
+}
+
+/* Activity Tabs */
+.activity-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--glassdoor-bg);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.activity-tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--glassdoor-gray-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.activity-tab:hover {
+  color: var(--glassdoor-gray);
+}
+
+.activity-tab.active {
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-green-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Admin Activity Item */
+.activity-item.admin-activity {
+  flex-wrap: wrap;
+}
+
+.activity-item.admin-activity .activity-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.activity-item.admin-activity .activity-message {
+  flex: none;
+}
+
+.activity-item.admin-activity .activity-meta {
+  font-size: 11px;
+  color: var(--glassdoor-gray-light);
+}
+
+.activity-ip {
+  font-family: monospace;
+  font-size: 10px;
+  background: var(--glassdoor-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.activity-dot.orange { background: #f59e0b; }
+
+/* Loading Inline */
+.loading-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  color: var(--glassdoor-gray-light);
+}
+
+.loading-spinner.small {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
 
 /* Admin Filters */
 .admin-filters {
@@ -979,5 +1097,564 @@
 
   .modal-actions button {
     width: 100%;
+  }
+}
+
+/* Role Description */
+.role-description {
+  font-size: 12px;
+  color: var(--glassdoor-gray-light);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Role Type Badge */
+.role-type-badge {
+  display: inline-block;
+  background: var(--glassdoor-blue-light);
+  color: var(--glassdoor-blue);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* Permissions Summary Button */
+.permissions-summary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--glassdoor-gray-bg);
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--glassdoor-gray);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.permissions-summary-btn:hover {
+  background: var(--glassdoor-border);
+}
+
+.permissions-summary-btn .edit-icon {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+/* Status Select */
+.status-select {
+  padding: 6px 10px;
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 6px;
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Permissions Section */
+.permissions-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glassdoor-border);
+}
+
+.permissions-section > label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--glassdoor-gray);
+}
+
+/* Permissions Grid */
+.permissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.permission-resource {
+  background: var(--glassdoor-gray-bg);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.resource-header {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--glassdoor-gray);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--glassdoor-border);
+}
+
+.permission-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.permission-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--glassdoor-gray);
+  cursor: pointer;
+  padding: 4px 8px;
+  background: var(--glassdoor-white);
+  border-radius: 4px;
+  border: 1px solid var(--glassdoor-border);
+  transition: all 0.2s ease;
+}
+
+.permission-checkbox:hover {
+  border-color: var(--glassdoor-green);
+}
+
+.permission-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--glassdoor-green);
+}
+
+.permission-checkbox input[type="checkbox"]:checked + span {
+  color: var(--glassdoor-green);
+  font-weight: 500;
+}
+
+/* All Permissions Notice */
+.all-permissions-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: rgba(0, 168, 107, 0.1);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.all-permissions-notice span {
+  font-size: 24px;
+}
+
+.all-permissions-notice p {
+  margin: 0;
+  color: var(--glassdoor-gray);
+  font-size: 14px;
+}
+
+/* Modal Large */
+.modal-large {
+  max-width: 700px !important;
+  width: 90% !important;
+}
+
+/* Form Row for inline fields */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .permissions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Deleted Row */
+.deleted-row {
+  opacity: 0.6;
+  background: var(--glassdoor-gray-bg);
+}
+
+.deleted-row td {
+  text-decoration: line-through;
+  text-decoration-color: var(--glassdoor-gray-light);
+}
+
+.deleted-row .status-badge,
+.deleted-row .action-buttons {
+  text-decoration: none;
+}
+
+/* Restore Button */
+.action-btn.restore {
+  color: var(--glassdoor-green);
+}
+
+.action-btn.restore:hover {
+  background: rgba(0, 168, 107, 0.1);
+}
+
+/* Company Owner */
+.company-owner {
+  font-size: 12px;
+  color: var(--glassdoor-gray-light);
+  display: block;
+  margin-top: 2px;
+}
+
+/* ========== Admin Configs ========== */
+.admin-configs {
+  padding: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-configs .admin-header {
+  display: block;
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.admin-configs .admin-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--glassdoor-gray);
+  margin: 0 0 8px 0;
+}
+
+.admin-subtitle {
+  font-size: 14px;
+  color: var(--glassdoor-gray-light);
+  margin: 0;
+}
+
+.config-layout {
+  display: flex;
+  gap: 24px;
+}
+
+.config-tabs {
+  width: 240px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.config-tab {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: var(--glassdoor-white);
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.config-tab:hover {
+  border-color: var(--glassdoor-green);
+  background: var(--glassdoor-green-light);
+}
+
+.config-tab.active {
+  background: var(--glassdoor-green);
+  border-color: var(--glassdoor-green);
+  color: white;
+}
+
+.tab-icon {
+  font-size: 20px;
+}
+
+.tab-label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.tab-count {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.config-tab.active .tab-count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.config-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.config-section {
+  background: var(--glassdoor-white);
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.config-section h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  margin: 0 0 20px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--glassdoor-border);
+}
+
+.config-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.config-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 16px;
+  background: var(--glassdoor-gray-bg);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.config-item.modified {
+  border-color: var(--glassdoor-green);
+  background: var(--glassdoor-green-light);
+}
+
+.config-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.config-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--glassdoor-gray);
+  margin-bottom: 4px;
+}
+
+.config-description {
+  font-size: 13px;
+  color: var(--glassdoor-gray-light);
+  margin-bottom: 8px;
+}
+
+.config-key {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.config-key code {
+  font-size: 11px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  color: var(--glassdoor-gray-light);
+}
+
+.public-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  background: #3b82f6;
+  color: white;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.config-control {
+  flex-shrink: 0;
+  min-width: 200px;
+}
+
+.config-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  transition: all 0.2s ease;
+}
+
+.config-input:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px var(--glassdoor-green-light);
+}
+
+.config-textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  resize: vertical;
+  min-height: 60px;
+  transition: all 0.2s ease;
+}
+
+.config-textarea:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px var(--glassdoor-green-light);
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 28px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background-color: var(--glassdoor-green);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+  transform: translateX(22px);
+}
+
+.config-save-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background: var(--glassdoor-white);
+  border-top: 1px solid var(--glassdoor-border);
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.changes-count {
+  font-size: 14px;
+  color: var(--glassdoor-gray);
+  font-weight: 500;
+}
+
+.save-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.alert-success {
+  background: var(--glassdoor-green-light);
+  color: var(--glassdoor-green-dark);
+  border: 1px solid var(--glassdoor-green);
+}
+
+.alert-error {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+@media (max-width: 768px) {
+  .admin-configs {
+    padding: 16px;
+  }
+
+  .config-layout {
+    flex-direction: column;
+  }
+
+  .config-tabs {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .config-tab {
+    min-width: 120px;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .tab-label {
+    font-size: 12px;
+  }
+
+  .config-item {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .config-control {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .config-save-bar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .save-actions {
+    width: 100%;
+  }
+
+  .save-actions button {
+    flex: 1;
   }
 }

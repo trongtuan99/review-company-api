@@ -129,6 +129,26 @@
   color: var(--glassdoor-gray-light);
 }
 
+.create-company-form textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--glassdoor-border);
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  background-color: var(--glassdoor-white);
+  color: var(--glassdoor-gray);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.create-company-form textarea:focus {
+  outline: none;
+  border-color: var(--glassdoor-green);
+  box-shadow: 0 0 0 3px var(--glassdoor-green-light);
+}
+
 /* Responsive - Mobile */
 @media (max-width: 768px) {
   .create-company-form {
