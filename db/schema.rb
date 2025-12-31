@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_12_24_180000) do
+ActiveRecord::Schema[7.0].define(version: 2025_12_28_001538) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -125,6 +125,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_12_24_180000) do
     t.integer "culture_rating", default: 0
     t.integer "employment_status", default: 0
     t.decimal "years_employed", precision: 3, scale: 1, default: "0.0"
+    t.integer "status", default: 1, null: false
+    t.index ["status"], name: "index_reviews_on_status"
   end
 
   create_table "roles", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

@@ -3,18 +3,28 @@ module AdminTrackable
 
   private
 
-  # Track admin actions - always log if user has admin capabilities
+  # Track admin actions - run after transaction to avoid corrupting main transaction
   def track_admin_action(action, resource, details = {})
     return unless current_user
     return unless can_perform_admin_actions?
 
-    AdminActivity.log(
+    # Store data for logging after transaction
+    activity_data = {
       user: current_user,
       action: action,
       resource: resource,
       details: details,
       request: request
-    )
+    }
+
+    # Use after_commit to log activity after main transaction completes
+    ActiveRecord::Base.connection.after_transaction_commit do
+      begin
+        AdminActivity.log(**activity_data)
+      rescue => e
+        Rails.logger.error "[AdminTrackable] Failed to log activity: #{e.message}"
+      end
+    end
   rescue => e
     Rails.logger.error "[AdminTrackable] Failed: #{e.message}"
   end

@@ -28,6 +28,7 @@ module ApiRoutes
               put :delete_review
               put :like
               put :dislike
+              put :update_status
             end
             collection do
               get :recent

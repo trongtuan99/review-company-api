@@ -147,6 +147,8 @@
     "pros": "Pros",
     "cons": "Cons",
     "advice": "Advice for Leadership",
+    "pendingApproval": "Pending Approval",
+    "contentPendingApproval": "This review content is pending approval and will be visible once approved by moderators.",
     "jobTitle": "Job Title",
     "anonymous": "Anonymous",
     "helpful": "helpful",

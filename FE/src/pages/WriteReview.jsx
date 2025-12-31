@@ -23,16 +23,16 @@ const WriteReview = () => {
     title: '',
     reviews_content: '',
     score: 5,
-    // Detailed ratings
-    work_environment_rating: 5,
-    salary_benefits_rating: 5,
+    // Detailed ratings (keys match backend model now)
+    salary_satisfaction: 5,
+    work_life_balance: 5,
+    career_growth: 5,
     management_rating: 5,
-    work_pressure_rating: 5,
     culture_rating: 5,
     // Job info
     job_title: '',
     custom_job_title: '',
-    employment_duration: '',
+    years_employed: '', // Changed from employment_duration
     employment_status: 'current', // current or former
     // Content
     pros: '',
@@ -40,7 +40,7 @@ const WriteReview = () => {
     advice: '',
     // Options
     is_anonymous: false,
-    would_recommend: true,
+    vote_for_work: true, // Changed from would_recommend
   });
   const [error, setError] = useState('');
 

@@ -22,6 +22,10 @@ export const adminService = {
   },
 
   // Reviews management
+  updateReviewStatus: async (reviewId, status) => {
+    return apiClient.put(`/review/${reviewId}/update_status`, { status });
+  },
+
   deleteReview: async (reviewId) => {
     return apiClient.put(`/review/${reviewId}/delete_review`);
   },

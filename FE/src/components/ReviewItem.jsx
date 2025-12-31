@@ -1,21 +1,23 @@
-import { useState, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useReviewMutations } from '../hooks/useReviewMutations';
 import ReplyList from './ReplyList';
 import CreateReplyForm from './CreateReplyForm';
 import './ReviewItem.css';
 
-const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
+const ReviewItem = ({ review, isAuthenticated, companyId }) => {
   const { t, i18n } = useTranslation();
-  // Local override state - only used during mutation, null otherwise
-  // Key prop from parent (review.id) should reset this component when review changes
   const [likeOverride, setLikeOverride] = useState(null);
   const [showReplies, setShowReplies] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyRefreshKey, setReplyRefreshKey] = useState(0);
 
+  // When the parent's review data changes, reset our local optimistic state.
+  useEffect(() => {
+    setLikeOverride(null);
+  }, [review]);
+
   // Use override state if set, otherwise use props directly
-  // Check if likeOverride exists (not null), then use all its values
   const currentReview = likeOverride ? {
     ...review,
     total_like: likeOverride.total_like,
@@ -23,26 +25,9 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
     user_like_status: likeOverride.user_like_status,
   } : review;
 
-  const handleMutationSuccess = useCallback((reviewId, reviewData) => {
-    if (reviewData && reviewData.id === reviewId) {
-      // Update override with server response, then clear after delay
-      setLikeOverride({
-        total_like: reviewData.total_like,
-        total_dislike: reviewData.total_dislike,
-        user_like_status: reviewData.user_like_status,
-      });
-      // Clear override after parent has time to update props
-      setTimeout(() => {
-        setLikeOverride(null);
-      }, 500);
-    }
-    onUpdate?.();
-  }, [onUpdate]);
-
   const { likeReview, dislikeReview, isLiking, isDisliking } = useReviewMutations(
     review.id,
-    companyId,
-    handleMutationSuccess
+    companyId
   );
 
   const liked = currentReview.user_like_status === 'like';
@@ -185,69 +170,80 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
 
   return (
     <div className="review-item">
-      <div className="review-header">
-        <div className="review-title-score">
-          <h4>{currentReview.title}</h4>
-          <div className="score-badge">⭐ {currentReview.score}/10</div>
+      {currentReview.status === 'pending' ? (
+        // Pending review: show only status badge and placeholder
+        <div className="pending-review-placeholder">
+          <span className="pending-badge">⏳ {t('review.pendingApproval')}</span>
+          <p className="pending-text">Nội dung đánh giá này đang chờ duyệt</p>
         </div>
-        <div className="review-meta">
-          {currentReview.job_title && (
-            <span className="job-title-badge">💼 {currentReview.job_title}</span>
-          )}
-          {currentReview.is_anonymous ? (
-            <span className="anonymous-badge">🔒 {t('components.anonymous')}</span>
-          ) : (
-            <span className="review-author">👤 {currentReview.user_name || t('components.user')}</span>
-          )}
-          {currentReview.created_at && (
-            <span className="review-date">{formatDate(currentReview.created_at)}</span>
-          )}
-        </div>
-      </div>
+      ) : (
+        // Approved review: show full content
+        <>
+          <div className="review-header">
+            <div className="review-title-score">
+              <h4>{currentReview.title}</h4>
+              <div className="score-badge">⭐ {currentReview.score}/10</div>
+            </div>
+            <div className="review-meta">
+              {currentReview.job_title && (
+                <span className="job-title-badge">💼 {currentReview.job_title}</span>
+              )}
+              {currentReview.is_anonymous ? (
+                <span className="anonymous-badge">🔒 {t('components.anonymous')}</span>
+              ) : (
+                <span className="review-author">👤 {currentReview.user_name || t('components.user')}</span>
+              )}
+              {currentReview.created_at && (
+                <span className="review-date">{formatDate(currentReview.created_at)}</span>
+              )}
+            </div>
+          </div>
 
-      <div className="review-content">
-        {currentReview.reviews_content
-          ? formatReviewContent(currentReview.reviews_content)
-          : <p>{t('components.noReviewContent')}</p>
-        }
-      </div>
+          <div className="review-content">
+            {currentReview.reviews_content
+              ? formatReviewContent(currentReview.reviews_content)
+              : <p>{t('components.noReviewContent')}</p>
+            }
+          </div>
 
-      <div className="review-actions">
-        {isAuthenticated && (
-          <>
+          <div className="review-actions">
+            {isAuthenticated && (
+              <>
+                <button
+                  className={`action-btn ${liked ? 'active' : ''}`}
+                  onClick={handleLike}
+                  disabled={loading}
+                >
+                  👍 {currentReview.total_like || 0}
+                </button>
+                <button
+                  className={`action-btn ${disliked ? 'active' : ''}`}
+                  onClick={handleDislike}
+                  disabled={loading}
+                >
+                  👎 {currentReview.total_dislike || 0}
+                </button>
+              </>
+            )}
             <button
-              className={`action-btn ${liked ? 'active' : ''}`}
-              onClick={handleLike}
-              disabled={loading}
+              className="action-btn"
+              onClick={() => setShowReplies(!showReplies)}
             >
-              👍 {currentReview.total_like || 0}
+              💬 {currentReview.total_reply || 0} {t('components.replies')}
             </button>
-            <button
-              className={`action-btn ${disliked ? 'active' : ''}`}
-              onClick={handleDislike}
-              disabled={loading}
-            >
-              👎 {currentReview.total_dislike || 0}
-            </button>
-          </>
-        )}
-        <button
-          className="action-btn"
-          onClick={() => setShowReplies(!showReplies)}
-        >
-          💬 {currentReview.total_reply || 0} {t('components.replies')}
-        </button>
-        {isAuthenticated && (
-          <button
-            className="action-btn"
-            onClick={() => setShowReplyForm(!showReplyForm)}
-          >
-            {showReplyForm ? t('common.cancel') : t('components.reply')}
-          </button>
-        )}
-      </div>
+            {isAuthenticated && (
+              <button
+                className="action-btn"
+                onClick={() => setShowReplyForm(!showReplyForm)}
+              >
+                {showReplyForm ? t('common.cancel') : t('components.reply')}
+              </button>
+            )}
+          </div>
+        </>
+      )}
 
-      {showReplyForm && isAuthenticated && (
+      {currentReview.status !== 'pending' && showReplyForm && isAuthenticated && (
         <CreateReplyForm
           reviewId={currentReview.id}
           onSuccess={() => {
@@ -255,13 +251,12 @@ const ReviewItem = ({ review, isAuthenticated, onUpdate, companyId }) => {
             setShowReplies(true);
             // Force refresh by incrementing key - ensures ReplyList remounts and fetches fresh data
             setReplyRefreshKey(prev => prev + 1);
-            onUpdate?.();
           }}
           onCancel={() => setShowReplyForm(false)}
         />
       )}
 
-      {showReplies && (
+      {currentReview.status !== 'pending' && showReplies && (
         <div className="replies-section">
           <ReplyList
             key={`replies-${currentReview.id}-${replyRefreshKey}`}

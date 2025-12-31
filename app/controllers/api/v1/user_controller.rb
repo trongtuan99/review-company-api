@@ -43,7 +43,7 @@ class Api::V1::UserController < ApplicationController
     render json: json_with_success(data: {
       total_users: User.where(is_deleted: false).count,
       total_companies: Company.where(is_deleted: false).count,
-      total_reviews: Review.where(is_deleted: false).count
+      total_reviews: Review.approved.where(is_deleted: false).count
     })
   end
 

@@ -1,5 +1,5 @@
 class AdminActivity < ApplicationRecord
-  belongs_to :user
+  belongs_to :user, optional: true
 
   # Action types
   ACTIONS = %w[
@@ -19,16 +19,29 @@ class AdminActivity < ApplicationRecord
   scope :by_resource, ->(type) { where(resource_type: type) }
 
   def self.log(user:, action:, resource:, details: {}, request: nil)
-    create!(
-      user: user,
+    # Store user_id as string to avoid foreign key issues in multi-tenant setup
+    # The user might be in a different schema (public) than admin_activities (tenant)
+    activity_data = {
       action: action,
       resource_type: resource.class.name,
       resource_id: resource.id,
       resource_name: extract_resource_name(resource),
-      details: details,
+      details: details.merge(
+        performed_by_email: user&.email,
+        performed_by_name: [user&.first_name, user&.last_name].compact.join(' ')
+      ),
       ip_address: request&.remote_ip,
       user_agent: request&.user_agent
-    )
+    }
+    
+    # Try to set user if in same schema, otherwise just log without user association
+    begin
+      activity_data[:user] = user if user && User.exists?(user.id)
+    rescue => e
+      Rails.logger.warn "[AdminActivity] User lookup failed: #{e.message}"
+    end
+    
+    create!(activity_data)
   rescue => e
     Rails.logger.error "Failed to log admin activity: #{e.message}"
     nil

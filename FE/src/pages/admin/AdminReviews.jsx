@@ -119,6 +119,18 @@ const AdminReviews = () => {
     }
   };
 
+  const handleUpdateStatus = async (reviewId, status) => {
+    try {
+      await adminService.updateReviewStatus(reviewId, status);
+      setReviews(prevReviews => 
+        prevReviews.map(r => r.id === reviewId ? { ...r, status: status } : r)
+      );
+    } catch (error) {
+      console.error('Error updating review status:', error);
+      alert(t('admin.errorOccurred') + ': ' + (error.message || 'Unknown error'));
+    }
+  };
+
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: { label: t('admin.pending'), class: 'pending' },
@@ -267,7 +279,24 @@ const AdminReviews = () => {
                   <td>
                     <span className="rating-badge">⭐ {review.score || review.overall_rating || review.rating || 'N/A'}</span>
                   </td>
-                  <td>{getStatusBadge(review.status || 'approved')}</td>
+                  <td>
+                    <select
+                      value={review.status || 'approved'}
+                      onChange={(e) => handleUpdateStatus(review.id, e.target.value)}
+                      className="status-select"
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        border: '1px solid #ddd',
+                        fontSize: '13px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <option value="pending">{t('admin.pending')}</option>
+                      <option value="approved">{t('admin.approved')}</option>
+                      <option value="rejected">{t('admin.rejected')}</option>
+                    </select>
+                  </td>
                   <td>{review.total_like || 0}</td>
                   <td>{formatDate(review.created_at)}</td>
                   <td>
