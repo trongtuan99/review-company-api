@@ -36,128 +36,110 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const isDevelopment = import.meta.env.DEV;
+
 
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ConfigProvider>
-        <Router>
-        <div className="app">
-          <Routes>
-            {/* Admin Routes */}
-            <Route
-              path="/admin"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminDashboard />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/reviews"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminReviews />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/users"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminUsers />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/companies"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminCompanies />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/roles"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminRoles />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/configs"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminConfigs />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/admin/contact-messages"
-              element={
-                <AdminRoute>
-                  <AdminLayout>
-                    <AdminContactMessages />
-                  </AdminLayout>
-                </AdminRoute>
-              }
-            />
+          <Router>
+            <div className="app">
+              <Routes>
+                {/* Admin Routes */}
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/reviews"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminReviews />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminUsers />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/companies"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminCompanies />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/roles"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminRoles />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/configs"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminConfigs />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/admin/contact-messages"
+                  element={
+                    <AdminRoute>
+                      <AdminLayout>
+                        <AdminContactMessages />
+                      </AdminLayout>
+                    </AdminRoute>
+                  }
+                />
 
-            {/* Public Routes */}
-            <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
-            <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
-            <Route path="/" element={<MainLayout><Home /></MainLayout>} />
-            <Route path="/companies" element={<MainLayout><AllCompanies /></MainLayout>} />
-            <Route path="/companies/:id" element={<MainLayout><CompanyDetail /></MainLayout>} />
-            <Route path="/about" element={<MainLayout><About /></MainLayout>} />
-            <Route path="/faq" element={<MainLayout><FAQ /></MainLayout>} />
-            <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
-            <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
-            <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
-            <Route path="/guidelines" element={<MainLayout><Guidelines /></MainLayout>} />
-            <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
-            <Route path="/sitemap" element={<MainLayout><Sitemap /></MainLayout>} />
-            <Route path="/write-review" element={<MainLayout><WriteReview /></MainLayout>} />
-            <Route path="/reviews/:id" element={<MainLayout><ReviewDetail /></MainLayout>} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          {isDevelopment && (
-            <div style={{
-              position: 'fixed',
-              bottom: '10px',
-              right: '10px',
-              background: '#f8f9fa',
-              border: '1px solid #dee2e6',
-              borderRadius: '5px',
-              padding: '8px 12px',
-              fontSize: '11px',
-              color: '#666',
-              zIndex: 1000,
-              maxWidth: '300px',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-            }}>
-              <strong>API URL:</strong><br />
-              <code style={{ fontSize: '10px', wordBreak: 'break-all' }}>{API_BASE_URL}</code>
+                {/* Public Routes */}
+                <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
+                <Route path="/register" element={<MainLayout><Register /></MainLayout>} />
+                <Route path="/" element={<MainLayout><Home /></MainLayout>} />
+                <Route path="/companies" element={<MainLayout><AllCompanies /></MainLayout>} />
+                <Route path="/companies/:id" element={<MainLayout><CompanyDetail /></MainLayout>} />
+                <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+                <Route path="/faq" element={<MainLayout><FAQ /></MainLayout>} />
+                <Route path="/profile" element={<MainLayout><Profile /></MainLayout>} />
+                <Route path="/terms" element={<MainLayout><Terms /></MainLayout>} />
+                <Route path="/privacy" element={<MainLayout><Privacy /></MainLayout>} />
+                <Route path="/guidelines" element={<MainLayout><Guidelines /></MainLayout>} />
+                <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+                <Route path="/sitemap" element={<MainLayout><Sitemap /></MainLayout>} />
+                <Route path="/write-review" element={<MainLayout><WriteReview /></MainLayout>} />
+                <Route path="/reviews/:id" element={<MainLayout><ReviewDetail /></MainLayout>} />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+
             </div>
-          )}
-        </div>
-      </Router>
+          </Router>
         </ConfigProvider>
-    </AuthProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
